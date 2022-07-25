@@ -8,11 +8,11 @@
 #Time step (seconds)
 0.0025
 #Initial condition
-5
+1
 #Test case
-1
+2
 #Monotonization method (0 or 1)
-1
+0
 #-----------Description of parameters -------------------------------------
 #Possible initial conditions
 #  case(1) - sine wave
