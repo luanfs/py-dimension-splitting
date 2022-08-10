@@ -56,13 +56,13 @@ class simulation_par_2d:
 
         # Define the domain extremes, advection velocity, etc
         if ic == 1:
-            x0, xf = 0, 40
-            y0, yf = 0, 40
+            x0, xf = -1.0, 1.0
+            y0, yf = -1.0, 1.0
             name = 'Sine wave'
 
         elif ic == 2:
-            x0, xf = 0, 80
-            y0, yf = 0, 80
+            x0, xf = -1.0, 1.0
+            y0, yf = -1.0, 1.0
             name = 'Gaussian wave'
 
         elif ic == 3:
@@ -147,13 +147,11 @@ def qexact_adv_2d(x, y, t, simulation):
         Y[mask] = (Y[mask]-y0)%(yf-y0) + y0 # maps back to [y0,yf]
 
         if simulation.ic == 1:
-            z = np.sin(2.0*np.pi*X/20.0)*np.sin(2.0*np.pi*Y/20.0) + 1.0
+            z = np.sin(2.0*np.pi*X)*np.sin(2.0*np.pi*Y) + 1.0
 
         elif simulation.ic == 2:
-            x0 = 40
-            y0 = 40
-            sigma = 5
-            z = np.exp(-((X-x0)/sigma)**2)*np.exp(-((Y-y0)/sigma)**2)
+            z = np.exp(-5.0*(np.sin(np.pi*X))**2)
+            z = z*np.exp(-5.0*(np.sin(np.pi*Y))**2)
 
         elif simulation.ic == 3:
             mask1 = np.logical_and(X>=15.0,X<=20.0)
@@ -186,11 +184,11 @@ def qexact_adv_2d(x, y, t, simulation):
 ####################################################################################
 def velocity_adv_2d(x, y, t, simulation):
     if simulation.ic == 1:
-        u = 0.5
-        v = 0.5
+        u = 0.2
+        v = -0.1
     elif simulation.ic == 2:
-        u = 0.5
-        v = 0.5
+        u = -0.1
+        v = 0.1
     elif simulation.ic == 3:
         u = 0.5
         v = 0.5

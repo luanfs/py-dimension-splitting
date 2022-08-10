@@ -84,7 +84,7 @@ def adv_2d(simulation, plot):
     Uplot = np.zeros((nplot, nplot))
     Vplot = np.zeros((nplot, nplot))
     Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot] = velocity_adv_2d(xplot, yplot, 0.0, simulation)
-    plotstep = 100
+    plotstep = 1
 
     # Plot the initial condition graph
     if plot:
@@ -95,7 +95,7 @@ def adv_2d(simulation, plot):
         plot_2dfield_graphs([Q[2:N+2,2:M+2]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
 
     # Compute initial mass
-    total_mass0, mass_change = diagnostics_adv_2d(Q[2:N+2,2:M+2], simulation, 1.0)
+    total_mass0, _ = diagnostics_adv_2d(Q, simulation, 1.0)
 
     # Error variables
     error_linf = np.zeros(Nsteps+1)
@@ -108,27 +108,25 @@ def adv_2d(simulation, plot):
         u_edges[0:N+1, 0:M], _ = velocity_adv_2d(Xu, Yu, t*dt, simulation)
         _, v_edges[0:N, 0:M+1] = velocity_adv_2d(Xv, Yv, t*dt, simulation)
 
-        # Applies F and operators
+        # Applies F and G operators
         FQ = F_operator(Q, u_edges, simulation)
         GQ = G_operator(Q, v_edges, simulation)
 
-        Qx = Q + 0.5*FQ
-        Qy = Q + 0.5*GQ
-
-        F = F_operator(Qy, u_edges, simulation)
-        G = G_operator(Qx, v_edges, simulation)
+        F = F_operator(Q + 0.5*GQ, u_edges, simulation)
+        G = G_operator(Q + 0.5*FQ, v_edges, simulation)
 
         # Update
         Q = Q + F + G
+        #Q[2:N+2,2:M+2] = Q[2:N+2,2:M+2] + F[2:N+2,2:M+2] + G[2:N+2,2:M+2]
         #Q[2:N+2,2:M+2] = qexact_adv_2d(Xc, Yc, t*dt, simulation)
 
         # Periodic boundary conditions
         # x direction
-        Q[N+2:N+5,:] = Q[2:5,:]
-        Q[0:2,:]     = Q[N:N+2,:]
+        #Q[N+2:N+5,:] = Q[2:5,:]
+        #Q[0:2,:]     = Q[N:N+2,:]
         # y direction
-        Q[:,M+2:M+5] = Q[:,2:5]
-        Q[:,0:2]     = Q[:,M:M+2]
+        #Q[:,M+2:M+5] = Q[:,2:5]
+        #Q[:,0:2]     = Q[:,M:M+2]
 
         # Output and plot
         if plot:

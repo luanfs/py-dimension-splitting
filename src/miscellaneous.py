@@ -39,7 +39,12 @@ def createDirs():
 # Diagnostic variables computation
 ####################################################################################
 def diagnostics_adv_2d(Q_average, simulation, total_mass0):
-    total_mass =  np.sum(Q_average[2:simulation.N+2, 2:simulation.M+2])*simulation.dx*simulation.dy  # Compute new mass
+    N  = simulation.N    # Number of cells in x direction
+    M  = simulation.M    # Number of cells in y direction
+    dx = simulation.dx   # Grid spacing in x direction
+    dy = simulation.dy   # Grid spacing in y direction
+    
+    total_mass =  np.sum(Q_average[2:N+2,2:M+2])*dx*dy  # Compute new mass
     if abs(total_mass0)>10**(-10):
         mass_change = abs(total_mass0-total_mass)/abs(total_mass0)
     else:
