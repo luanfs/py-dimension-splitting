@@ -48,6 +48,28 @@ def plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title):
     plt.close()
 
 ####################################################################################
+# Compute and plot the convergence rate
+####################################################################################
+def plot_convergence_rate(N, error_linf, error_l1, error_l2, filename, title):
+    n = len(N)
+    CR_linf = np.abs(np.log(error_linf[1:n])-np.log(error_linf[0:n-1]))/np.log(2.0)
+    CR_l1   = np.abs(np.log(error_l1[1:n])  -np.log(error_l1[0:n-1]))/np.log(2.0)
+    CR_l2   = np.abs(np.log(error_l2[1:n])  -np.log(error_l2[0:n-1]))/np.log(2.0)
+
+    plt.xscale('log')
+    plt.plot(N[1:n], CR_linf, color='green', marker='x', label = '$L_\infty$')
+    plt.plot(N[1:n], CR_l1, color='blue',  marker='o', label = '$L_1$')
+    plt.plot(N[1:n], CR_l2, color='red',   marker='D', label = '$L_2$')
+
+    plt.xlabel('N (number of cells)')
+    plt.ylabel('Convergence rate')
+    plt.legend()
+    plt.grid(True, which="both")
+    plt.title(title)
+    plt.savefig(filename, format='png')
+    plt.close()
+
+####################################################################################
 # Print the errors of the ith simulation
 ####################################################################################
 def print_errors_simul(error_linf, error_l1, error_l2, i):

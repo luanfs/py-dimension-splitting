@@ -31,7 +31,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 7
+    Ntest = 6
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -83,6 +83,11 @@ def error_analysis_adv2d(simulation):
     filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
-    # Print final message
+    # Print message
     print('\nGraphs have been ploted in '+graphdir)
     print('Convergence graphs has been ploted in '+filename)
+
+    # Plot the convergence rate
+    title = 'Convergence rate - ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
+    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate.png'
+    plot_convergence_rate(N, error_linf, error_l1, error_l2, filename, title)
