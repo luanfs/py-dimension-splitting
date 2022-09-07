@@ -123,8 +123,8 @@ class simulation_par_2d:
 # Initial condition
 ####################################################################################
 def q0_adv_2d(x, y, simulation):
-    y = qexact_adv_2d(x, y, 0, simulation)
-    return y
+    q = qexact_adv_2d(x, y, 0, simulation)
+    return q
 
 ####################################################################################
 # Exact solution to the advection problem
