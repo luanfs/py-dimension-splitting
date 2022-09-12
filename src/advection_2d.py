@@ -1,6 +1,6 @@
 ####################################################################################
 #
-# Piecewise Parabolic Method (PPM) advection module
+# Advection module
 # Luan da Fonseca Santos - April 2022
 # Solves the 2d advection equation  with periodic boundary conditions
 # The initial condition Q(x,y,0) is given in the module parameters_2d.py
@@ -13,10 +13,10 @@
 ####################################################################################
 
 import numpy as np
-from errors import *
-from miscellaneous       import diagnostics_adv_2d, print_diagnostics_adv_2d, plot_2dfield_graphs
+from miscellaneous       import diagnostics_adv_2d, print_diagnostics_adv_2d, plot_2dfield_graphs, output_adv
 from parameters_2d       import q0_adv_2d, graphdir, qexact_adv_2d, velocity_adv_2d
 from dimension_splitting import F_operator, G_operator
+from errors import *
 
 def adv_2d(simulation, plot):
     N  = simulation.N    # Number of cells in x direction
@@ -76,23 +76,8 @@ def adv_2d(simulation, plot):
     Q[:,M+2:M+5] = Q[:,2:5]
     Q[:,0:2]     = Q[:,M:M+2]
 
-    # Vector field plot var
-    nplot = 40
-    xplot = np.linspace(x0, xf, nplot)
-    yplot = np.linspace(y0, yf, nplot)
-    xplot, yplot = np.meshgrid(xplot, yplot)
-    Uplot = np.zeros((nplot, nplot))
-    Vplot = np.zeros((nplot, nplot))
-    Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot] = velocity_adv_2d(xplot, yplot, 0.0, simulation)
-    plotstep = 1
-
-    # Plot the initial condition graph
-    if plot:
-        qmin = str("{:.2e}".format(np.amin(Q[2:N+2,2:M+2])))
-        qmax = str("{:.2e}".format(np.amax(Q[2:N+2,2:M+2])))
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(0)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        title = '2D advection - '+icname+' - time='+str(0)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-        plot_2dfield_graphs([Q[2:N+2,2:M+2]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+    # Plotting var
+    plotstep = 100
 
     # Compute initial mass
     total_mass0, _ = diagnostics_adv_2d(Q, simulation, 1.0)
@@ -101,12 +86,18 @@ def adv_2d(simulation, plot):
     error_linf = np.zeros(Nsteps+1)
     error_l1   = np.zeros(Nsteps+1)
     error_l2   = np.zeros(Nsteps+1)
+    
+    # Initial plotting
+    output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, 0, 0.0, Nsteps, plotstep, total_mass0, CFL)
 
     # Time looping
-    for t in range(1, Nsteps+1):
+    for k in range(1, Nsteps+1):
+        # Time
+        t = k*dt
+
         # Velocity update
-        u_edges[0:N+1, 0:M], _ = velocity_adv_2d(Xu, Yu, t*dt, simulation)
-        _, v_edges[0:N, 0:M+1] = velocity_adv_2d(Xv, Yv, t*dt, simulation)
+        u_edges[0:N+1, 0:M], _ = velocity_adv_2d(Xu, Yu, t, simulation)
+        _, v_edges[0:N, 0:M+1] = velocity_adv_2d(Xv, Yv, t, simulation)
 
         # Applies F and G operators
         FQ = F_operator(Q, u_edges, simulation)
@@ -129,64 +120,12 @@ def adv_2d(simulation, plot):
         #Q[:,0:2]     = Q[:,M:M+2]
 
         # Output and plot
-        if plot:
-            # Compute exact solution
-            q_exact = qexact_adv_2d(Xc, Yc, t*dt, simulation)
-
-            # Diagnostic computation
-            total_mass, mass_change = diagnostics_adv_2d(Q, simulation, total_mass0)
-
-            # Relative errors in different metrics
-            error_linf[t], error_l1[t], error_l2[t] = compute_errors(Q[2:N+2,2:M+2], q_exact)
-
-            if error_linf[t] > 10**(1):
-                # CFL number
-                CFL_x = np.amax(abs(u_edges))*dt/dx
-                CFL_y = np.amax(abs(v_edges))*dt/dy
-                CFL = np.sqrt(CFL_x**2 + CFL_y**2)
-                print('\nStopping due to large errors.')
-                print('The CFL number is', CFL)
-                exit()
-
-            if t%plotstep == 0:
-                # Plot the graph and print diagnostic
-                    qmin = str("{:.2e}".format(np.amin(Q)))
-                    qmax = str("{:.2e}".format(np.amax(Q)))
-                    Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t*dt, simulation)
-                    filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-                    title = '2D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-                    plot_2dfield_graphs([Q[2:N+2,2:M+2]], Xc, Yc, [Uplot], [Vplot], xplot, yplot,  filename, title)
-            print_diagnostics_adv_2d(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
-
+        output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
     #---------------------------------------End of time loop---------------------------------------
 
     if plot:
-        # Plot the error graph
+        # Plot the error evolution graph
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_erros.png'
+        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_errors.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
-
-        # Plot the solution graph
-        qmin = str("{:.2e}".format(np.amin(Q)))
-        qmax = str("{:.2e}".format(np.amax(Q)))
-
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        title = '2D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-        plot_2dfield_graphs([Q[2:N+2,2:M+2]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
-        print('\nGraphs have been ploted in '+ graphdir)
-        print('Error evolution is shown in '+filename)
-
-    else:
-        # Compute exact solution
-        q_exact = qexact_adv_2d(Xc, Yc, Tf, simulation)
-
-        # Relative errors in different metrics
-        error_inf, error_1, error_2 = compute_errors(Q[2:N+2,2:M+2], q_exact)
-
-        # Plot the solution graph
-        qmin = str("{:.2e}".format(np.amin(Q)))
-        qmax = str("{:.2e}".format(np.amax(Q)))
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        title = '2D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-        plot_2dfield_graphs([Q[2:N+2,2:M+2]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
-        return error_inf, error_1, error_2
+    return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]

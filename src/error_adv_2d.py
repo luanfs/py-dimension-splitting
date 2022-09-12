@@ -80,7 +80,7 @@ def error_analysis_adv2d(simulation):
 
     # Plot the errors
     title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
+    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
     # Print message
