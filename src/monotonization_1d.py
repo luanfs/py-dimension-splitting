@@ -20,7 +20,10 @@ import numpy as np
 ###################################################################################
 # Apply the 1D PPM monotonization in x direction
 ####################################################################################
-def monotonization_1d_x(Q, q_L, q_R, dq, q6, N, mono):
+def monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation):
+    N = simulation.N
+    mono = simulation.mono
+
     if mono == 0:
         return
     elif mono == 1:
@@ -54,7 +57,10 @@ def monotonization_1d_x(Q, q_L, q_R, dq, q6, N, mono):
 ####################################################################################
 # Apply the 1D PPM monotonization in y direction
 ####################################################################################
-def monotonization_1d_y(Q, q_L, q_R, dq, q6, M, mono):
+def monotonization_1d_y(Q, q_L, q_R, dq, q6, simulation):
+    M = simulation.N
+    mono = simulation.mono
+
     if mono == 0:
         return
     elif mono == 1:

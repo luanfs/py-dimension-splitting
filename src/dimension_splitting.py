@@ -26,7 +26,7 @@ def flux_ppm_x(Q, u_edges, simulation):
     dq, q6, q_L, q_R = rec.ppm_reconstruction_x(Q, simulation)
 
     # Applies monotonization on the parabolas
-    monotonization_1d_x(Q, q_L, q_R, dq, q6, N, simulation.mono)
+    monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation)
 
     # Compute the fluxes
     F = numerical_flux_x(q_R, q_L, dq, q6, u_edges, simulation)
@@ -79,7 +79,7 @@ def flux_ppm_y(Q, v_edges, simulation):
     dq, q6, q_L, q_R = rec.ppm_reconstruction_y(Q, simulation)
 
     # Applies monotonization on the parabolas
-    monotonization_1d_y(Q, q_L, q_R, dq, q6, M, simulation.mono)
+    monotonization_1d_y(Q, q_L, q_R, dq, q6, simulation)
 
     # Compute the fluxes
     G = numerical_flux_y(q_R, q_L, dq, q6, v_edges, simulation)
