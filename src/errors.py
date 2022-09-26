@@ -97,7 +97,7 @@ def compute_errors(Q, Qref):
     error_1 = np.sum(E)/n
 
     # L_2 error
-    error_2 = np.sqrt(np.sum(E*E))/n
+    error_2 = np.sqrt(np.sum(E*E)/n)
 
     return error_inf, error_1, error_2
 

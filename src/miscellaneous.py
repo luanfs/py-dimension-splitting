@@ -45,7 +45,7 @@ def diagnostics_adv_2d(Q_average, simulation, total_mass0):
     dx = simulation.dx   # Grid spacing in x direction
     dy = simulation.dy   # Grid spacing in y direction
     
-    total_mass =  np.sum(Q_average[2:N+2,2:M+2])*dx*dy  # Compute new mass
+    total_mass =  np.sum(Q_average[3:N+3,3:M+3])*dx*dy  # Compute new mass
     if abs(total_mass0)>10**(-10):
         mass_change = abs(total_mass0-total_mass)/abs(total_mass0)
     else:
@@ -94,7 +94,7 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
         total_mass, mass_change = diagnostics_adv_2d(Q, simulation, total_mass0)
 
         # Relative errors in different metrics
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q[2:N+2,2:M+2], q_exact)
+        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q[3:N+3,3:M+3], q_exact)
 
         if error_linf[k] > 10**(1):
             # CFL number
@@ -137,4 +137,4 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
             filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
             title = '2D advection - '+icname+' - time='+str(t)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-            plot_2dfield_graphs([Q[2:N+2,2:M+2]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+            plot_2dfield_graphs([Q[3:N+3,3:M+3]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)

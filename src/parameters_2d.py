@@ -15,9 +15,11 @@ pardir   = "par/"               # Parameter files directory
 # Create the 1d grid
 ####################################################################################
 def grid_1d(x0, xf, N):
-    x  = np.linspace(x0, xf, N+1) # Cell edges
-    xc = (x[0:N] + x[1:N+1])/2    # Cell centers
-    dx = (xf-x0)/N                # Grid length
+    ngl = 3 # Ghost cells on left
+    ngr = 3 # Ghost cells on right
+    dx  = (xf-x0)/N                # Grid length
+    x   = np.linspace(x0-3.0*dx, xf+3.0*dx, N+1+ngl+ngl) # Cell edges
+    xc  = (x[0:N+ngl+ngl] + x[1:N+1+ngl+ngl])/2    # Cell centers
     return x, xc, dx
 
 ####################################################################################
