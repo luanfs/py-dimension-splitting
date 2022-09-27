@@ -63,8 +63,8 @@ class simulation_par_2d:
             name = 'Sine wave'
 
         elif ic == 2:
-            x0, xf = -1.0, 1.0
-            y0, yf = -1.0, 1.0
+            x0, xf = 0.0, 1.0
+            y0, yf = 0.0, 1.0
             name = 'Gaussian wave'
 
         elif ic == 3:
