@@ -15,7 +15,9 @@
 import numpy as np
 from miscellaneous       import diagnostics_adv_2d, print_diagnostics_adv_2d, plot_2dfield_graphs, output_adv
 from parameters_2d       import q0_adv_2d, graphdir, qexact_adv_2d, velocity_adv_2d
-from dimension_splitting import F_operator, G_operator, F_operator_stencil, G_operator_stencil
+from dimension_splitting import F_operator, G_operator
+from stencil             import flux_ppm_x_stencil_coefficients, flux_ppm_y_stencil_coefficients
+from cfl                 import cfl_x, cfl_y
 from errors import *
 
 def adv_2d(simulation, plot):
@@ -59,10 +61,34 @@ def adv_2d(simulation, plot):
     u_edges[:, :], _ = velocity_adv_2d(Xu, Yu, 0.0, simulation)
     _, v_edges[:,:] = velocity_adv_2d(Xv, Yv, 0.0, simulation)
 
+    # CFL at edges - x direction
+    cx, cx2 = cfl_x(u_edges, simulation)
+ 
+    # CFL at edges - y direction
+    cy, cy2 = cfl_y(v_edges, simulation)
+ 
     # CFL number
-    CFL_x = np.amax(abs(u_edges))*dt/dx
-    CFL_y = np.amax(abs(v_edges))*dt/dy
+    CFL_x = np.amax(cx)
+    CFL_y = np.amax(cy)
     CFL = np.sqrt(CFL_x**2 + CFL_y**2)
+
+    # Dimension splitting variables
+    FQ = np.zeros((N+6, M+6))
+    GQ = np.zeros((N+6, M+6))
+    F  = np.zeros((N+6, M+6))    
+    G  = np.zeros((N+6, M+6))
+
+    # Flux at edges
+    flux_x = np.zeros((N+7, M+6))
+    flux_y = np.zeros((N+6, M+7))
+
+    # Stencil coefficients
+    ay = np.zeros((6, N+6, M+7))
+    ax = np.zeros((6, N+7, M+6))
+
+    # Compute the coefficients
+    flux_ppm_x_stencil_coefficients(u_edges, ax, cx, cx2, simulation)
+    flux_ppm_y_stencil_coefficients(v_edges, ay, cy, cy2, simulation)
 
     # Compute average values of Q (initial condition)
     Q = np.zeros((N+6, M+6))
@@ -96,12 +122,12 @@ def adv_2d(simulation, plot):
         t = k*dt
 
         # Applies F and G operators
-        FQ = F_operator(Q, u_edges, simulation)
-        GQ = G_operator(Q, v_edges, simulation)
+        F_operator(FQ, Q, u_edges, flux_x, ax, cx, cx2, simulation)
+        G_operator(GQ, Q, v_edges, flux_y, ay, cy, cy2, simulation)
 
         # Applies F and G operators again
-        F = F_operator(Q + 0.5*GQ, u_edges, simulation)
-        G = G_operator(Q + 0.5*FQ, v_edges, simulation)
+        F_operator(F, Q + 0.5*GQ, u_edges, flux_x, ax, cx, cx2, simulation)
+        G_operator(G, Q + 0.5*FQ, v_edges, flux_y, ay, cy, cy2, simulation)
 
         # Update
         #Q = Q + F + G
@@ -115,10 +141,23 @@ def adv_2d(simulation, plot):
         Q[:,M+3:M+6] = Q[:,3:6]
         Q[:,0:3]     = Q[:,M:M+3]
 
-        # Velocity update
-        u_edges[:,:], _ = velocity_adv_2d(Xu, Yu, t, simulation)
-        _, v_edges[:,:] = velocity_adv_2d(Xv, Yv, t, simulation)
+        # Velocity and  CFL numbers update - only for time dependent velocity
+        if simulation.ic == 5:
+            # Velocity update
+            u_edges[:,:], _ = velocity_adv_2d(Xu, Yu, t, simulation)
+            _, v_edges[:,:] = velocity_adv_2d(Xv, Yv, t, simulation)
+ 
+            # CFL at edges - x direction
+            cx, cx2 = cfl_x(u_edges, simulation)
+ 
+            # CFL at edges - y direction
+            cy, cy2 = cfl_y(v_edges, simulation)
+            
+            # Coefs update
+            flux_ppm_x_stencil_coefficients(u_edges, ax, cx, cx2, simulation)
+            flux_ppm_y_stencil_coefficients(v_edges, ay, cy, cy2, simulation)
 
+ 
         # Output and plot
         output_adv(Xc[3:N+3,3:M+3], Yc[3:N+3,3:M+3], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
     #---------------------------------------End of time loop---------------------------------------

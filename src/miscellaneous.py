@@ -97,12 +97,7 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
         error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q[3:N+3,3:M+3], q_exact)
 
         if error_linf[k] > 10**(1):
-            # CFL number
-            CFL_x = np.amax(abs(u_edges))*dt/dx
-            CFL_y = np.amax(abs(v_edges))*dt/dy
-            CFL = np.sqrt(CFL_x**2 + CFL_y**2)
             print('\nStopping due to large errors.')
-            print('The CFL number is', CFL)
             exit()
 
         # Diagnostic computation

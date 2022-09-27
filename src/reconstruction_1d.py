@@ -25,6 +25,10 @@ def ppm_reconstruction_x(Q, simulation):
     N = simulation.N
     M = simulation.M
 
+    if simulation.monot == 'none':
+        dq, q6, q_L, q_R = np.zeros((N+6, M+6)), np.zeros((N+6, M+6)), np.zeros((N+6, M+6)), np.zeros((N+6, M+6))
+        return  dq, q6, q_L, q_R 
+
     # Compute the slopes dQ0 (centered finite difference)
     # Formula 1.7 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
     dQ0 = np.zeros((N+6, M+6))
@@ -75,6 +79,11 @@ def ppm_reconstruction_x(Q, simulation):
 def ppm_reconstruction_y(Q, simulation):
     N = simulation.N
     M = simulation.M
+
+    if simulation.monot == 'none':
+        dq, q6, q_L, q_R = np.zeros((N+6, M+6)), np.zeros((N+6, M+6)), np.zeros((N+6, M+6)), np.zeros((N+6, M+6))
+        return  dq, q6, q_L, q_R 
+
     # Compute the slopes dQ0 (centered finite difference)
     # Formula 1.7 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
     dQ0 = np.zeros((N+6, M+6))

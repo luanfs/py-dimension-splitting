@@ -9,31 +9,7 @@
 #
 ###################################################################################
 
-import numpy as np
-import reconstruction_1d as rec
-from monotonization_1d import monotonization_1d_x, monotonization_1d_y
-from flux import numerical_flux_x, numerical_flux_y, flux_ppm_x_stencil, flux_ppm_y_stencil
-
-####################################################################################
-# Compute the 1d flux operator from PPM
-# Inputs: Q (average values),  u_edges (velocity at edges)
-####################################################################################
-def flux_ppm_x(Q, u_edges, simulation):
-    N = simulation.N
-    M = simulation.M
-
-    # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction_x(Q, simulation)
-
-    # Applies monotonization on the parabolas
-    monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation)
-
-    # Compute the fluxes
-    F = numerical_flux_x(q_R, q_L, dq, q6, u_edges, simulation)
-
-    flux = u_edges[4:N+4,:]*F[4:N+4,:] - u_edges[3:N+3,:]*F[3:N+3,:]
-
-    return flux
+from flux import compute_flux_x, compute_flux_y
 
 ####################################################################################
 # Flux operator in x direction
@@ -41,52 +17,10 @@ def flux_ppm_x(Q, u_edges, simulation):
 # u_edges (velocity in x direction at edges)
 # Formula 2.7 from Lin and Rood 1996
 ####################################################################################
-def F_operator(Q, u_edges, simulation):
+def F_operator(F, Q, u_edges, flux_x, ax, cx, cx2, simulation):
     N = simulation.N
-    M = simulation.M
-    F = np.zeros((N+6, M+6))
-
-    F[3:N+3,:] = -(simulation.dt/simulation.dx)*flux_ppm_x(Q, u_edges, simulation)
-
-    return F
-
-####################################################################################
-# Flux operator in x direction
-# Inputs: Q (average values),
-# u_edges (velocity in x direction at edges)
-# Formula 2.7 from Lin and Rood 1996
-####################################################################################
-def F_operator_stencil(Q, u_edges, simulation):
-    N = simulation.N
-    M = simulation.M
-
-    flux_x = flux_ppm_x_stencil(Q, u_edges, simulation)
-
-    F = np.zeros((N+6, M+6))
-    F[:,:] = -(simulation.dt/simulation.dx)*(flux_x[1:N+7,:] - flux_x[0:N+6,:])
-
-    return F
-
-####################################################################################
-# Compute the 1d flux operator from PPM
-# Inputs: Q (average values),  u_edges (velocity at edges)
-####################################################################################
-def flux_ppm_y(Q, v_edges, simulation):
-    N = simulation.N
-    M = simulation.M
-
-    # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction_y(Q, simulation)
-
-    # Applies monotonization on the parabolas
-    monotonization_1d_y(Q, q_L, q_R, dq, q6, simulation)
-
-    # Compute the fluxes
-    G = numerical_flux_y(q_R, q_L, dq, q6, v_edges, simulation)
-
-    flux = v_edges[:,4:M+4]*G[:,4:M+4] - v_edges[:,3:M+3]*G[:,3:M+3]
-
-    return flux
+    compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation)
+    F[3:N+3,:] = -(simulation.dt/simulation.dx)*(u_edges[4:N+4,:]*flux_x[4:N+4,:] - u_edges[3:N+3,:]*flux_x[3:N+3,:])
 
 ####################################################################################
 # Flux operator in y direction
@@ -94,28 +28,8 @@ def flux_ppm_y(Q, v_edges, simulation):
 # v_edges (velocity in y direction at edges)
 # Formula 2.8 from Lin and Rood 1996
 ####################################################################################
-def G_operator(Q, v_edges, simulation):
-    N = simulation.N
+def G_operator(G, Q, v_edges, flux_y, ay, cy, cy2, simulation):
     M = simulation.M
-    G = np.zeros((N+6, M+6))
+    compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation)
+    G[:, 3:M+3] = -(simulation.dt/simulation.dy)*(v_edges[:,4:M+4]*flux_y[:,4:M+4] - v_edges[:,3:M+3]*flux_y[:,3:M+3])
 
-    G[:, 3:M+3] = -(simulation.dt/simulation.dy)*flux_ppm_y(Q, v_edges, simulation)
-
-    return G
-
-####################################################################################
-# Flux operator in y direction
-# Inputs: Q (average values),
-# v_edges (velocity in y direction at edges)
-# Formula 2.8 from Lin and Rood 1996
-####################################################################################
-def G_operator_stencil(Q, v_edges, simulation):
-    N = simulation.N
-    M = simulation.M
-
-    flux_y = flux_ppm_y_stencil(Q, v_edges, simulation)
-
-    G = np.zeros((N+6, M+6))
-    G[:,:] = -(simulation.dt/simulation.dy)*(flux_y[:,1:M+7] - flux_y[:,0:M+6])
-
-    return G
