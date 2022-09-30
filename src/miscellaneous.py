@@ -44,8 +44,14 @@ def diagnostics_adv_2d(Q_average, simulation, total_mass0):
     M  = simulation.M    # Number of cells in y direction
     dx = simulation.dx   # Grid spacing in x direction
     dy = simulation.dy   # Grid spacing in y direction
-    
-    total_mass =  np.sum(Q_average[3:N+3,3:M+3])*dx*dy  # Compute new mass
+
+    # Grid interior indexes
+    i0 = simulation.i0
+    iend = simulation.iend
+    j0 = simulation.j0
+    jend = simulation.jend
+
+    total_mass =  np.sum(Q_average[i0:iend,j0:jend])*dx*dy  # Compute new mass
     if abs(total_mass0)>10**(-10):
         mass_change = abs(total_mass0-total_mass)/abs(total_mass0)
     else:
@@ -86,6 +92,12 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
     dx = simulation.dx
     dt = simulation.dt
 
+    # Grid interior indexes
+    i0 = simulation.i0
+    iend = simulation.iend
+    j0 = simulation.j0
+    jend = simulation.jend
+
     if plot or k==Nsteps:
         # Compute exact solution
         q_exact = qexact_adv_2d(Xc, Yc, t, simulation)
@@ -94,9 +106,9 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
         total_mass, mass_change = diagnostics_adv_2d(Q, simulation, total_mass0)
 
         # Relative errors in different metrics
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q[3:N+3,3:M+3], q_exact)
+        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q[i0:iend,j0:jend], q_exact)
 
-        if error_linf[k] > 10**(1):
+        if error_linf[k] > 10**(2):
             print('\nStopping due to large errors.')
             exit()
 
@@ -132,4 +144,4 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
             filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
             title = '2D advection - '+icname+' - time='+str(t)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-            plot_2dfield_graphs([Q[3:N+3,3:M+3]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+            plot_2dfield_graphs([Q[i0:iend,j0:jend]], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)

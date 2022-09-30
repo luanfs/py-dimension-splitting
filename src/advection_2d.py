@@ -44,9 +44,20 @@ def adv_2d(simulation, plot):
     icname = simulation.icname
     mono   = simulation.mono  # Monotonization scheme
 
+    # Ghost cells
+    ngl = simulation.ngl
+    ngr = simulation.ngr
+    ng  = simulation.ng
+    
+    # Grid interior indexes
+    i0 = simulation.i0
+    iend = simulation.iend
+    j0 = simulation.j0
+    jend = simulation.jend
+
     # Velocity at edges
-    u_edges = np.zeros((N+7, M+6))
-    v_edges = np.zeros((N+6, M+7))
+    u_edges = np.zeros((N+ng+1, M+ng))
+    v_edges = np.zeros((N+ng, M+ng+1))
 
     # Number of time steps
     Nsteps = int(Tf/dt)
@@ -73,34 +84,35 @@ def adv_2d(simulation, plot):
     CFL = np.sqrt(CFL_x**2 + CFL_y**2)
 
     # Dimension splitting variables
-    FQ = np.zeros((N+6, M+6))
-    GQ = np.zeros((N+6, M+6))
-    F  = np.zeros((N+6, M+6))    
-    G  = np.zeros((N+6, M+6))
+    FQ = np.zeros((N+ng, M+ng))
+    GQ = np.zeros((N+ng, M+ng))
+    F  = np.zeros((N+ng, M+ng))    
+    G  = np.zeros((N+ng, M+ng))
 
     # Flux at edges
-    flux_x = np.zeros((N+7, M+6))
-    flux_y = np.zeros((N+6, M+7))
+    flux_x = np.zeros((N+ng+1, M+ng))
+    flux_y = np.zeros((N+ng, M+ng+1))
 
     # Stencil coefficients
-    ay = np.zeros((6, N+6, M+7))
-    ax = np.zeros((6, N+7, M+6))
+    ay = np.zeros((6, N+ng, M+ng+1))
+    ax = np.zeros((6, N+ng+1, M+ng))
 
     # Compute the coefficients
     flux_ppm_x_stencil_coefficients(u_edges, ax, cx, cx2, simulation)
     flux_ppm_y_stencil_coefficients(v_edges, ay, cy, cy2, simulation)
 
     # Compute average values of Q (initial condition)
-    Q = np.zeros((N+6, M+6))
-    Q[3:N+3,3:M+3] = q0_adv_2d(Xc[3:N+3,3:M+3], Yc[3:N+3,3:M+3], simulation)
+    Q = np.zeros((N+ng, M+ng))
+    Q[i0:iend,j0:jend] = q0_adv_2d(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation)
 
     # Periodic boundary conditions
     # x direction
-    Q[N+3:N+6,:] = Q[3:6,:]
-    Q[0:3,:]     = Q[N:N+3,:]
+    Q[iend:N+ng,:] = Q[i0:i0+ngr,:]
+    Q[0:i0,:]      = Q[N:N+ngl,:]
+
     # y direction
-    Q[:,M+3:M+6] = Q[:,3:6]
-    Q[:,0:3]     = Q[:,M:M+3]
+    Q[:,jend:N+ng] = Q[:,j0:j0+ngr]
+    Q[:,0:j0]      = Q[:,M:M+ngl]
 
     # Plotting var
     plotstep = 100
@@ -114,7 +126,7 @@ def adv_2d(simulation, plot):
     error_l2   = np.zeros(Nsteps+1)
     
     # Initial plotting
-    output_adv(Xc[3:N+3,3:M+3] , Yc[3:N+3,3:M+3] , simulation, Q, error_linf, error_l1, error_l2, plot, 0, 0.0, Nsteps, plotstep, total_mass0, CFL)
+    output_adv(Xc[i0:iend,j0:jend] , Yc[i0:iend,j0:jend] , simulation, Q, error_linf, error_l1, error_l2, plot, 0, 0.0, Nsteps, plotstep, total_mass0, CFL)
 
     # Time looping
     for k in range(1, Nsteps+1):
@@ -131,15 +143,16 @@ def adv_2d(simulation, plot):
 
         # Update
         #Q = Q + F + G
-        Q[3:N+3,3:M+3] = Q[3:N+3,3:M+3] + F[3:N+3,3:M+3] + G[3:N+3,3:M+3]
+        Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] + F[i0:iend,j0:jend] + G[i0:iend,j0:jend]
 
         # Periodic boundary conditions
         # x direction
-        Q[N+3:N+6,:] = Q[3:6,:]
-        Q[0:3,:]     = Q[N:N+3,:]
+        Q[iend:N+ng,:] = Q[i0:i0+ngr,:]
+        Q[0:i0,:]      = Q[N:N+ngl,:]
+
         # y direction
-        Q[:,M+3:M+6] = Q[:,3:6]
-        Q[:,0:3]     = Q[:,M:M+3]
+        Q[:,jend:N+ng] = Q[:,j0:j0+ngr]
+        Q[:,0:j0]      = Q[:,M:M+ngl]
 
         # Velocity and  CFL numbers update - only for time dependent velocity
         if simulation.ic == 4:
@@ -159,7 +172,7 @@ def adv_2d(simulation, plot):
 
  
         # Output and plot
-        output_adv(Xc[3:N+3,3:M+3], Yc[3:N+3,3:M+3], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
+        output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
     #---------------------------------------End of time loop---------------------------------------
 
     if plot:

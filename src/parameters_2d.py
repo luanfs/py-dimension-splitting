@@ -14,20 +14,18 @@ pardir   = "par/"               # Parameter files directory
 ####################################################################################
 # Create the 1d grid
 ####################################################################################
-def grid_1d(x0, xf, N):
-    ngl = 3 # Ghost cells on left
-    ngr = 3 # Ghost cells on right
+def grid_1d(x0, xf, N, ngl, ngr, ng):
     dx  = (xf-x0)/N                # Grid length
-    x   = np.linspace(x0-3.0*dx, xf+3.0*dx, N+1+ngl+ngl) # Cell edges
-    xc  = (x[0:N+ngl+ngl] + x[1:N+1+ngl+ngl])/2    # Cell centers
+    x   = np.linspace(x0-ngl*dx, xf+ngr*dx, N+1+ng) # Cell edges
+    xc  = (x[0:N+ng] + x[1:N+1+ng])/2    # Cell centers
     return x, xc, dx
 
 ####################################################################################
 # Create the 2d grid
 ####################################################################################
-def grid_2d(x0, xf, N, y0, yf, M):
-    x, xc, dx = grid_1d(x0, xf, N)
-    y, yc, dy = grid_1d(y0, yf, M)
+def grid_2d(x0, xf, N, y0, yf, M, ngl, ngr, ng):
+    x, xc, dx = grid_1d(x0, xf, N, ngl, ngr, ng)
+    y, yc, dy = grid_1d(y0, yf, M, ngl, ngr, ng)
     return x, xc, dx, y, yc, dy
 
 ####################################################################################
@@ -95,8 +93,20 @@ class simulation_par_2d:
         self.y0 = y0
         self.yf = yf
 
+        # Ghost cells variables
+        self.ngl = 3
+        self.ngr = 3
+        self.ng  = self.ngl + self.ngr
+
+        # Grid interior indexes       
+        self.i0   = self.ngl
+        self.iend = self.ngl + N
+        # Grid interior indexes       
+        self.j0   = self.ngl
+        self.jend = self.ngl + M
+
         # Grid
-        self.x, self.xc, self.dx, self.y, self.yc, self.dy = grid_2d(x0, xf, N, y0, yf, M)
+        self.x, self.xc, self.dx, self.y, self.yc, self.dy = grid_2d(x0, xf, N, y0, yf, M, self.ngl, self.ngr, self.ng)
 
         # IC name
         self.icname = name
