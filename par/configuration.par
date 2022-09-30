@@ -1,14 +1,14 @@
 #Parameters 
 #Number of cells N 
-200
+100
 #Number of cells M 
-200
+100
 #Total period definition (seconds)
-5
-#Time step (seconds)
-0.0025
-#Initial condition
 1
+#Time step (seconds)
+0.005
+#Initial condition
+2
 #Test case
 2
 #Monotonization method (0 or 1)
@@ -17,9 +17,8 @@
 #Possible initial conditions
 #  case(1) - sine wave
 #  case(2) - gaussian wave
-#  case(3) - triangular wave
-#  case(4) - rectangular wave
-#  case(5) - deformational flow
+#  case(3) - rectangular wave
+#  case(4) - deformational flow
 #Possible test cases
 #  case(1) - Advection simulation
 #  case(2) - Convergence of error for advection equation

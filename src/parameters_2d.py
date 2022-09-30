@@ -70,19 +70,14 @@ class simulation_par_2d:
         elif ic == 3:
             x0, xf = 0, 40
             y0, yf = 0, 40
-            name = 'Triangular wave'
-
-        elif ic == 4:
-            x0, xf = 0, 40
-            y0, yf = 0, 40
             name = 'Rectangular wave'
 
-        elif ic == 5:
+        elif ic == 4:
             x0, xf = -np.pi, np.pi
             y0, yf = -np.pi*0.5, np.pi*0.5
             name = 'Two gaussian hills'
         else:
-            print("Error - invalid test case")
+            print("Error - invalid initial condition")
             exit()
 
         # Monotonization:
@@ -138,7 +133,7 @@ def qexact_adv_2d(x, y, t, simulation):
     yf = simulation.yf
     ic = simulation.ic
 
-    if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
+    if simulation.ic >= 1 and simulation.ic <= 3 : # constant speed
         u, v = velocity_adv_2d(x, y, t, simulation)
         X = x-u*t
         mask = (X != xf)
@@ -156,20 +151,12 @@ def qexact_adv_2d(x, y, t, simulation):
             z = z*np.exp(-5.0*(np.sin(np.pi*Y))**2)
 
         elif simulation.ic == 3:
-            mask1 = np.logical_and(X>=15.0,X<=20.0)
-            mask2 = np.logical_and(X>=20.0,X<=25.0)
-
-            z = x*0
-            z[mask1==True] = ( X[mask1==True] - 15.0)/5.0
-            z[mask2==True] = (-X[mask2==True] + 25.0)/5.0
-
-        elif simulation.ic == 4:
             maskx = np.logical_and(X>=15.0,X<=25.0)
             masky = np.logical_and(Y>=15.0,Y<=25.0)
             z = x*0
             z[np.logical_and(maskx, masky)] = 1.0
 
-    elif simulation.ic == 5:
+    elif simulation.ic == 4:
         A = 0.2
         Lx = 2*np.pi
         x0 = -1*Lx/12.0
@@ -195,9 +182,6 @@ def velocity_adv_2d(x, y, t, simulation):
         u = 0.5
         v = 0.5
     elif simulation.ic == 4:
-        u = 0.5
-        v = 0.5
-    elif simulation.ic == 5:
         phi_hat = 10
         T = 5
 

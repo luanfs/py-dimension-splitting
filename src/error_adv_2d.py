@@ -44,10 +44,10 @@ def error_analysis_adv2d(simulation):
 
     u, v = velocity_adv_2d(x0, y0, 0, simulation)
     # Period
-    if simulation.ic >= 1 and simulation.ic <= 4: # constant velocity
+    if simulation.ic >= 1 and simulation.ic <= 3: # constant velocity
         Tf = 5.0
         dt[0] = 0.25
-    elif simulation.ic == 5: #deformational flow
+    elif simulation.ic == 4: #deformational flow
         Tf = 5.0
         dt[0] = 0.05
     else:

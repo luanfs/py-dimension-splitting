@@ -142,7 +142,7 @@ def adv_2d(simulation, plot):
         Q[:,0:3]     = Q[:,M:M+3]
 
         # Velocity and  CFL numbers update - only for time dependent velocity
-        if simulation.ic == 5:
+        if simulation.ic == 4:
             # Velocity update
             u_edges[:,:], _ = velocity_adv_2d(Xu, Yu, t, simulation)
             _, v_edges[:,:] = velocity_adv_2d(Xv, Yv, t, simulation)
