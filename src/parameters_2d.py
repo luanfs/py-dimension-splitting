@@ -31,7 +31,7 @@ def grid_2d(x0, xf, N, y0, yf, M, ngl, ngr, ng):
 ####################################################################################
 #  Simulation class
 ####################################################################################
-class simulation_par_2d:
+class simulation_adv_par_2d:
     def __init__(self, N, M, dt, Tf, ic, vf, tc, mono):
         # Number of cells in x direction
         self.N  = N
