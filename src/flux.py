@@ -42,7 +42,7 @@ def numerical_flux_x(Q, q_R, q_L, dq, q6, u_edges, flux_x, ax, cx, cx2, simulati
     if simulation.mono == 1: # Monotonization
         numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, simulation)
 
-    elif simulation.mono == 0: # No monotonization 
+    elif simulation.mono == 0: # No monotonization
         if simulation.fvmethod == 'PPM':
             flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation)
 
@@ -77,7 +77,7 @@ def numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, simulation):
 ####################################################################################
 def flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation):
     N = simulation.N
-    
+
     #flux_ppm_x_stencil_coefficients(u_edges, ax, cx, cx2, simulation)
 
     flux_x[3:N+4,:] = ax[0,3:N+4,:]*Q[0:N+1,:] +\
@@ -112,7 +112,7 @@ def numerical_flux_y(Q, q_R, q_L, dq, q6, v_edges, flux_y, ay, cy, cy2, simulati
     if simulation.mono == 1: # Monotonization
         numerical_flux_ppm_y(q_R, q_L, dq, q6, v_edges, flux_y, simulation)
 
-    elif simulation.mono == 0: # No monotonization 
+    elif simulation.mono == 0: # No monotonization
         if simulation.fvmethod == 'PPM':
             flux_ppm_y_stencil(Q, v_edges, flux_y, ay, cy, cy2, simulation)
 
