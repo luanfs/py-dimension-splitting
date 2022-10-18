@@ -161,3 +161,13 @@ def flux_ppm_y_stencil(Q, v_edges, flux_y, ay, cy, cy2, simulation):
                       ay[5,:,3:M+4]*Q[:,5:M+6]
 
     flux_y[:,3:M+4]  = flux_y[:,3:M+4]/12.0
+
+
+####################################################################################
+# Compute the fluxes needed for dimension spliting operators
+####################################################################################
+def compute_fluxes(Q_x, Q_y, u_edges, v_edges, flux_x, flux_y, ax, ay, cx, cy, cx2, cy2, simulation):
+
+    compute_flux_x(flux_x, Q_x, u_edges, ax, cx, cx2, simulation)
+
+    compute_flux_y(flux_y, Q_y, v_edges, ay, cy, cy2, simulation)

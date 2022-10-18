@@ -8,8 +8,10 @@ from dimension_splitting import F_operator, G_operator
 from advection_ic        import velocity_adv_2d
 from stencil             import flux_ppm_x_stencil_coefficients, flux_ppm_y_stencil_coefficients
 from cfl                 import cfl_x, cfl_y
+from flux                import compute_fluxes
 
 def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, flux_x, flux_y, ax, cx, cx2, ay, cy, cy2, Xu, Yu, Xv, Yv, t, simulation):
+
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
 
@@ -26,13 +28,19 @@ def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, flux_x, flux_y, ax, cx, cx2,
     jend = simulation.jend
 
 
+    # Compute the fluxes
+    compute_fluxes(Q, Q, u_edges, v_edges, flux_x, flux_y, ax, ay, cx, cy, cx2, cy2, simulation)
+
     # Applies F and G operators
-    F_operator(FQ, Q, u_edges, flux_x, ax, cx, cx2, simulation)
-    G_operator(GQ, Q, v_edges, flux_y, ay, cy, cy2, simulation)
+    F_operator(FQ, u_edges, flux_x, ax, cx, cx2, simulation)
+    G_operator(GQ, v_edges, flux_y, ay, cy, cy2, simulation)
+
+    # Compute the fluxes again
+    compute_fluxes(Q + 0.5*GQ, Q + 0.5*FQ, u_edges, v_edges, flux_x, flux_y, ax, ay, cx, cy, cx2, cy2, simulation)
 
     # Applies F and G operators again
-    F_operator(F, Q + 0.5*GQ, u_edges, flux_x, ax, cx, cx2, simulation)
-    G_operator(G, Q + 0.5*FQ, v_edges, flux_y, ay, cy, cy2, simulation)
+    F_operator(F, u_edges, flux_x, ax, cx, cx2, simulation)
+    G_operator(G, v_edges, flux_y, ay, cy, cy2, simulation)
 
     # Update
     Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] + F[i0:iend,j0:jend] + G[i0:iend,j0:jend]

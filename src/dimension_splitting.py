@@ -9,7 +9,7 @@
 #
 ###################################################################################
 
-from flux import compute_flux_x, compute_flux_y
+#from flux import compute_flux_x, compute_flux_y
 
 ####################################################################################
 # Flux operator in x direction
@@ -17,9 +17,9 @@ from flux import compute_flux_x, compute_flux_y
 # u_edges (velocity in x direction at edges)
 # Formula 2.7 from Lin and Rood 1996
 ####################################################################################
-def F_operator(F, Q, u_edges, flux_x, ax, cx, cx2, simulation):
+def F_operator(F, u_edges, flux_x, ax, cx, cx2, simulation):
     N = simulation.N
-    compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation)
+    #compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation)
     F[3:N+3,:] = -(simulation.dt/simulation.dx)*(u_edges[4:N+4,:]*flux_x[4:N+4,:] - u_edges[3:N+3,:]*flux_x[3:N+3,:])
 
 ####################################################################################
@@ -28,8 +28,8 @@ def F_operator(F, Q, u_edges, flux_x, ax, cx, cx2, simulation):
 # v_edges (velocity in y direction at edges)
 # Formula 2.8 from Lin and Rood 1996
 ####################################################################################
-def G_operator(G, Q, v_edges, flux_y, ay, cy, cy2, simulation):
+def G_operator(G, v_edges, flux_y, ay, cy, cy2, simulation):
     M = simulation.M
-    compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation)
+    #compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation)
     G[:, 3:M+3] = -(simulation.dt/simulation.dy)*(v_edges[:,4:M+4]*flux_y[:,4:M+4] - v_edges[:,3:M+3]*flux_y[:,3:M+3])
 
