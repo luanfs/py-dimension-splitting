@@ -24,8 +24,8 @@ createDirs()
 
 # 2D advection test cases - parameters from par/configuration.par
 # Get parameters
-N, M, dt, Tf, tc, ic, mono = conf.get_test_parameters_2d('configuration.par')
-simulation = simulation_par_2d(N, M, dt, Tf, ic, tc, mono)
+N, M, dt, Tf, tc, ic, vf, mono = conf.get_test_parameters_2d('configuration.par')
+simulation = simulation_par_2d(N, M, dt, Tf, ic, vf, tc, mono)
 
 # Select test case
 if tc == 1:
