@@ -110,6 +110,9 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             elif simulation.ic == 3:
                 Qmin = -0.3
                 Qmax =  1.3
+            elif simulation.ic == 5:
+                Qmin =  0.95
+                Qmax =  1.05
             # Plot
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
             filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'

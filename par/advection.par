@@ -8,7 +8,7 @@
 #Velocity
 2
 #Test case
-2
+1
 #Monotonization method (0 or 1)
 0
 #-----------Description of parameters -------------------------------------
@@ -17,6 +17,7 @@
 #  case(2) - gaussian wave
 #  case(3) - rectangular wave
 #  case(4) - two gaussian hills
+#  case(5) - constant field
 #Possible velocity fields
 #  case(1) - constant velocity
 #  case(2) - deformational flow velocity (Nair et al 2010)

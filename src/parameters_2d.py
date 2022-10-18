@@ -69,6 +69,10 @@ class simulation_adv_par_2d:
 
         elif ic == 4:
             name = 'Two gaussian hills'
+
+        elif ic == 5:
+            name = 'Constant field'
+
         else:
             print("Error - invalid initial condition")
             exit()

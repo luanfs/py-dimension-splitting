@@ -64,6 +64,10 @@ def qexact_adv_2d(x, y, t, simulation):
         z0 = 0.95*np.exp(-((x-x0)**2 + (y-y0)**2)/A)
         z1 = 0.95*np.exp(-((x-x1)**2 + (y-y1)**2)/A)
         z = z0 + z1
+
+    elif simulation.ic == 5:
+        z = np.ones(np.shape(x))
+
     return z
 
 ####################################################################################
