@@ -31,6 +31,8 @@ def get_test_parameters_2d(filename):
         confpar.readline()
         ic = confpar.readline()
         confpar.readline()
+        vf = confpar.readline()
+        confpar.readline()
         tc = confpar.readline()
         confpar.readline()
         mono = confpar.readline()
@@ -45,6 +47,7 @@ def get_test_parameters_2d(filename):
         Tf = float(Tf)
         dt = float(dt)
         ic = int(ic)
+        vf = int(vf)
         tc = int(tc)
         mono = int(mono)
 
@@ -54,9 +57,11 @@ def get_test_parameters_2d(filename):
         print("Number of cells in x direction: ", N)
         print("Number of cells in y direction: ", M)
         print("Time step ", dt)
+        print("Initial condition ", ic)
+        print("Velocity field", vf)
         print("--------------------------------------------------------\n")
 
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return N, M, dt, Tf, tc, ic, mono
+    return N, M, dt, Tf, tc, ic,vf, mono

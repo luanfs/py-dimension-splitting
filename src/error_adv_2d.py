@@ -9,11 +9,15 @@
 from advection_2d import adv_2d
 import numpy as np
 from errors import *
-from parameters_2d import simulation_par_2d, graphdir, velocity_adv_2d
+from parameters_2d import simulation_par_2d, graphdir
+from advection_ic  import velocity_adv_2d
 
 def error_analysis_adv2d(simulation):
     # Initial condition
     ic = simulation.ic
+
+    # Velocity
+    vf = simulation.vf
 
     # Monotonization method
     mono = simulation.mono
@@ -44,10 +48,10 @@ def error_analysis_adv2d(simulation):
 
     u, v = velocity_adv_2d(x0, y0, 0, simulation)
     # Period
-    if simulation.ic >= 1 and simulation.ic <= 3: # constant velocity
+    if simulation.vf==1: # constant velocity
         Tf = 5.0
         dt[0] = 0.25
-    elif simulation.ic == 4: #deformational flow
+    elif simulation.vf == 2: #deformational flow
         Tf = 5.0
         dt[0] = 0.05
     else:
@@ -69,7 +73,7 @@ def error_analysis_adv2d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, tc, mono)
+        simulation = simulation_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, mono)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i] =  adv_2d(simulation, False)
