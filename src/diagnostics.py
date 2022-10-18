@@ -97,8 +97,12 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             Uplot = np.zeros((nplot, nplot))
             Vplot = np.zeros((nplot, nplot))
 
-            qmin = str(np.amin(Q))
-            qmax = str(np.amax(Q))
+            qmin = np.amin(Q)
+            qmax = np.amax(Q)
+            qmin = str("{:.2e}".format(qmin))
+            qmax = str("{:.2e}".format(qmax))
+            time = str("{:.2e}".format(t))
+            CFL  = str("{:.2e}".format(CFL))
 
             # colorbar range
             if simulation.ic == 1:
@@ -116,5 +120,5 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             # Plot
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
             filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-            title = '2D advection - '+icname+' - time='+str(t)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
+            title = '2D advection - '+icname+' - time='+time+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
             plot_2dfield_graphs([Q[i0:iend,j0:jend]], [Qmin], [Qmax], ['jet'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
