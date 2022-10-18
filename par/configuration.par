@@ -1,32 +1,10 @@
 #Parameters 
-#Number of cells N 
+#Number of cells N (x direction)
 100
-#Number of cells M 
+#Number of cells M (y direction)
 100
-#Total period definition (seconds)
-5
-#Time step (seconds)
-0.005
-#Initial condition
-4
-#Velocity
-2
-#Test case
+#Equation to be solved (1 or 2)
 1
-#Monotonization method (0 or 1)
-0
 #-----------Description of parameters -------------------------------------
-#Possible initial conditions
-#  case(1) - sine wave
-#  case(2) - gaussian wave
-#  case(3) - rectangular wave
-#  case(4) - two gaussian hills
-#Possible velocity fields
-#  case(1) - constant velocity
-#  case(2) - deformational flow velocity (Nair et al 2010)
-#Possible test cases
-#  case(1) - Advection simulation
-#  case(2) - Convergence of error for advection equation
-#Possible monotonization methods
-#  case(0) - none
-#  case(1) - Woodward and Collela 84 (WC84)
+#  case(1) - Linear advection equation (see advection.par)
+#  case(2) - Non linear shallow water equations (see sw.par)
