@@ -17,7 +17,7 @@ from miscellaneous           import createDirs
 
 from advection_2d            import adv_2d
 from parameters_2d           import simulation_adv_par_2d
-from error_adv_2d            import error_analysis_adv2d
+from advection_errors        import error_analysis_adv2d
 
 # Create directories
 createDirs()

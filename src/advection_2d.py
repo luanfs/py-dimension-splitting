@@ -13,8 +13,9 @@
 ####################################################################################
 
 import numpy as np
-from plot       import plot_2dfield_graphs
-from diagnostics         import diagnostics_adv_2d, print_diagnostics_adv_2d, output_adv
+from plot                import plot_2dfield_graphs
+from diagnostics         import diagnostics_adv_2d
+from output              import print_diagnostics_adv_2d, output_adv
 from parameters_2d       import graphdir
 from advection_ic        import q0_adv_2d, qexact_adv_2d, velocity_adv_2d
 from stencil             import flux_ppm_x_stencil_coefficients, flux_ppm_y_stencil_coefficients
