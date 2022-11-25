@@ -28,7 +28,7 @@ from monotonization_1d import monotonization_1d_x, monotonization_1d_y
 def compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation):
     N = simulation.N
 
-    if simulation.flux_method == 2: # Applies PPM with monotonization
+    if simulation.flux_method_name == 'PPM_mono_CW84': # Applies PPM with monotonization
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction_x(Q, simulation)
 
@@ -38,7 +38,7 @@ def compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation):
         # Compute the fluxes
         numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, simulation)
 
-    elif simulation.flux_method == 1 or simulation.flux_method == 3: # PPM or hybrid PPM
+    elif simulation.flux_method_name == 'PPM' or simulation.flux_method_name == 'PPM_hybrid': # PPM or hybrid PPM
         flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation)
 
 ####################################################################################
@@ -95,7 +95,7 @@ def flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation):
 def compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation):
     M = simulation.M
 
-    if simulation.flux_method == 2: # Applies PPM with monotonization
+    if simulation.flux_method_name == 'PPM_mono_CW84': # Applies PPM with monotonization
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction_y(Q, simulation)
 
@@ -105,7 +105,7 @@ def compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation):
         # Compute the fluxes
         numerical_flux_ppm_y(q_R, q_L, dq, q6, v_edges, flux_y, simulation)
 
-    elif simulation.flux_method ==  1 or simulation.flux_method == 3: # PPM or hybrid PPM
+    elif simulation.flux_method_name == 'PPM' or simulation.flux_method_name == 'PPM_hybrid': # PPM or hybrid PPM
         flux_ppm_y_stencil(Q, v_edges, flux_y, ay, cy, cy2, simulation)
 
 ####################################################################################

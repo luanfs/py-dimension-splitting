@@ -22,9 +22,9 @@ import numpy as np
 ####################################################################################
 def monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation):
     N = simulation.N
-    flux_method = simulation.flux_method
+    flux_method_name = simulation.flux_method_name
 
-    if flux_method == 2:
+    if flux_method_name == 'PPM_mono_CW84':
         # In each cell, check if Q is a local maximum
         # See First equation in formula 1.10 from Collela and Woodward 1984
         local_maximum = (q_R[2:N+4,:]-Q[2:N+4,:])*(Q[2:N+4,:]-q_L[2:N+4,:])<=0
@@ -57,9 +57,9 @@ def monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation):
 ####################################################################################
 def monotonization_1d_y(Q, q_L, q_R, dq, q6, simulation):
     M = simulation.N
-    flux_method = simulation.flux_method
+    flux_method_name = simulation.flux_method_name
 
-    if flux_method == 2:
+    if flux_method_name == 'PPM_mono_CW84':
         # In each cell, check if Q is a local maximum
         # See First equation in formula 1.10 from Collela and Woodward 1984
         local_maximum = (q_R[:,2:M+4]-Q[:,2:M+4])*(Q[:,2:M+4]-q_L[:,2:M+4])<=0
