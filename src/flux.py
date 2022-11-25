@@ -22,29 +22,24 @@ from monotonization_1d import monotonization_1d_x, monotonization_1d_y
 ####################################################################################
 # Compute the 1d flux operator
 # Inputs: Q (average values),  u_edges (velocity at edges)
+# ax (stencil coefficients), cx, cx2 (CFL, CFL^2 in x direction)
+# Output: flux_x (flux in x direction)
 ####################################################################################
 def compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation):
     N = simulation.N
 
-    # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction_x(Q, simulation)
+    if simulation.flux_method == 2: # Applies PPM with monotonization
+        # Reconstructs the values of Q using a piecewise parabolic polynomial
+        dq, q6, q_L, q_R = rec.ppm_reconstruction_x(Q, simulation)
 
-    # Applies monotonization on the parabolas
-    monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation)
+        # Applies monotonization on the parabolas
+        monotonization_1d_x(Q, q_L, q_R, dq, q6, simulation)
 
-    # Compute the fluxes
-    numerical_flux_x(Q, q_R, q_L, dq, q6, u_edges, flux_x, ax, cx, cx2, simulation)
-
-####################################################################################
-# Routine to compute the correct flux in x direction
-####################################################################################
-def numerical_flux_x(Q, q_R, q_L, dq, q6, u_edges, flux_x, ax, cx, cx2, simulation):
-    if simulation.mono == 1: # Monotonization
+        # Compute the fluxes
         numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, simulation)
 
-    elif simulation.mono == 0: # No monotonization
-        if simulation.fvmethod == 'PPM':
-            flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation)
+    elif simulation.flux_method == 1 or simulation.flux_method == 3: # PPM or hybrid PPM
+        flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation)
 
 ####################################################################################
 # PPM flux in x direction
@@ -74,6 +69,8 @@ def numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, simulation):
 ####################################################################################
 # Compute the 1d flux operator from PPM using its stencil
 # Inputs: Q (average values),  u_edges (zonal velocity at edges)
+# ax (stencil coefficients), cx, cx2 (CFL, CFL^2 in x direction)
+# Output: flux_x (flux in x direction)
 ####################################################################################
 def flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation):
     N = simulation.N
@@ -87,34 +84,29 @@ def flux_ppm_x_stencil(Q, u_edges, flux_x, ax, cx, cx2, simulation):
                       ax[4,3:N+4,:]*Q[4:N+5,:] +\
                       ax[5,3:N+4,:]*Q[5:N+6,:]
 
-    flux_x[3:N+4,:]  = flux_x[3:N+4,:]/12.0
+    flux_x[3:N+4,:]  = flux_x[3:N+4,:]
 
 ####################################################################################
-# Compute the 1d flux operator
+# Compute the 1d flux operator in y direction
 # Inputs: Q (average values),  v_edges (velocity at edges)
+# ay (stencil coefficients), cy, cy2 (CFL, CFL^2 in y direction)
+# Output: flux_y (flux in y direction)
 ####################################################################################
 def compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation):
     M = simulation.M
 
-    # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction_y(Q, simulation)
+    if simulation.flux_method == 2: # Applies PPM with monotonization
+        # Reconstructs the values of Q using a piecewise parabolic polynomial
+        dq, q6, q_L, q_R = rec.ppm_reconstruction_y(Q, simulation)
 
-    # Applies monotonization on the parabolas
-    monotonization_1d_y(Q, q_L, q_R, dq, q6, simulation)
+        # Applies monotonization on the parabolas
+        monotonization_1d_y(Q, q_L, q_R, dq, q6, simulation)
 
-    # Compute the fluxes
-    numerical_flux_y(Q, q_R, q_L, dq, q6, v_edges, flux_y, ay, cy, cy2, simulation)
-
-####################################################################################
-# Routine to compute the correct flux in x direction
-####################################################################################
-def numerical_flux_y(Q, q_R, q_L, dq, q6, v_edges, flux_y, ay, cy, cy2, simulation):
-    if simulation.mono == 1: # Monotonization
+        # Compute the fluxes
         numerical_flux_ppm_y(q_R, q_L, dq, q6, v_edges, flux_y, simulation)
 
-    elif simulation.mono == 0: # No monotonization
-        if simulation.fvmethod == 'PPM':
-            flux_ppm_y_stencil(Q, v_edges, flux_y, ay, cy, cy2, simulation)
+    elif simulation.flux_method ==  1 or simulation.flux_method == 3: # PPM or hybrid PPM
+        flux_ppm_y_stencil(Q, v_edges, flux_y, ay, cy, cy2, simulation)
 
 ####################################################################################
 # PPM flux in y direction
@@ -159,9 +151,6 @@ def flux_ppm_y_stencil(Q, v_edges, flux_y, ay, cy, cy2, simulation):
                       ay[3,:,3:M+4]*Q[:,3:M+4] +\
                       ay[4,:,3:M+4]*Q[:,4:M+5] +\
                       ay[5,:,3:M+4]*Q[:,5:M+6]
-
-    flux_y[:,3:M+4]  = flux_y[:,3:M+4]/12.0
-
 
 ####################################################################################
 # Compute the fluxes needed for dimension spliting operators

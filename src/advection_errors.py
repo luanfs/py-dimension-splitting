@@ -19,8 +19,8 @@ def error_analysis_adv2d(simulation):
     # Velocity
     vf = simulation.vf
 
-    # Monotonization method
-    mono = simulation.mono
+    # Flux method
+    flux_method = simulation.flux_method
 
     # Test case
     tc = simulation.tc
@@ -73,7 +73,7 @@ def error_analysis_adv2d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, mono)
+        simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, flux_method)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i] =  adv_2d(simulation, False)
@@ -83,8 +83,8 @@ def error_analysis_adv2d(simulation):
         print_errors_simul(error_linf, error_l1, error_l2, i)
 
     # Plot the errors
-    title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_errors.png'
+    title = simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
+    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
     # Print message
@@ -92,6 +92,6 @@ def error_analysis_adv2d(simulation):
     print('Convergence graphs has been ploted in '+filename)
 
     # Plot the convergence rate
-    title = 'Convergence rate - ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate.png'
+    title = 'Convergence rate - ' + simulation.flux_method_name + ' - ' + simulation.icname
+    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate.png'
     plot_convergence_rate(N, error_linf, error_l1, error_l2, filename, title)

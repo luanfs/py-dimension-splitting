@@ -17,7 +17,7 @@ def plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title):
     plt.loglog(N, error_linf, color='green', marker='x', label = '$L_\infty$')
     plt.loglog(N, error_l1 , color='blue',  marker='o', label = '$L_1$')
     plt.loglog(N, error_l2 , color='red',   marker='D', label = '$L_2$')
-    plt.ylim(10.0**(-14),np.amax(10*error_linf))
+    #plt.ylim(10.0**(-14),np.amax(10*error_linf))
 
     # Reference lines
     nref   = len(N)

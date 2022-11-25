@@ -5,7 +5,7 @@
 
 import numpy as np
 from dimension_splitting import F_operator, G_operator
-from advection_ic        import velocity_adv_2d
+from advection_ic        import velocity_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
 from stencil             import flux_ppm_x_stencil_coefficients, flux_ppm_y_stencil_coefficients
 from cfl                 import cfl_x, cfl_y
 from flux                import compute_fluxes
@@ -57,8 +57,8 @@ def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, flux_x, flux_y, ax, cx, cx2,
     # Velocity and  CFL numbers update - only for time dependent velocity
     if simulation.vf == 2:
         # Velocity update
-        u_edges[:,:], _ = velocity_adv_2d(Xu, Yu, t, simulation)
-        _, v_edges[:,:] = velocity_adv_2d(Xv, Yv, t, simulation)
+        u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, t, simulation)
+        v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, t, simulation)
 
         # CFL at edges - x direction
         cx, cx2 = cfl_x(u_edges, simulation)
@@ -66,6 +66,6 @@ def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, flux_x, flux_y, ax, cx, cx2,
         # CFL at edges - y direction
         cy, cy2 = cfl_y(v_edges, simulation)
 
-        # Coefs update
+        # Coeffs update
         flux_ppm_x_stencil_coefficients(u_edges, ax, cx, cx2, simulation)
         flux_ppm_y_stencil_coefficients(v_edges, ay, cy, cy2, simulation)

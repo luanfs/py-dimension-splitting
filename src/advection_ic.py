@@ -74,8 +74,39 @@ def qexact_adv_2d(x, y, t, simulation):
 # Velocity field
 ####################################################################################
 def velocity_adv_2d(x, y, t, simulation):
+    u = u_velocity_adv_2d(x, y, t, simulation)
+    v = v_velocity_adv_2d(x, y, t, simulation)
+    return u, v
+
+####################################################################################
+# Velocity field - u component
+####################################################################################
+def u_velocity_adv_2d(x, y, t, simulation):
     if simulation.vf == 1:
         u = 0.2
+    elif simulation.vf == 2:
+        phi_hat = 10
+        T = 5
+
+        pi = np.pi
+        twopi = pi*2.0
+        Lx = twopi
+        Ly = pi
+
+        arg1 = twopi*(x/Lx - t/T)
+        arg2 = pi*y/Ly
+        arg3 = pi*t/T
+        c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
+        u = c1 * (pi/Ly) * (np.sin(arg1))**2 * (2.0*np.cos(arg2)*np.sin(arg2)) * (np.cos(arg3))
+        u = u - Lx/T
+        u = -u
+    return u
+
+####################################################################################
+# Velocity field - v component
+####################################################################################
+def v_velocity_adv_2d(x, y, t, simulation):
+    if simulation.vf == 1:
         v = -0.1
     elif simulation.vf == 2:
         phi_hat = 10
@@ -91,8 +122,5 @@ def velocity_adv_2d(x, y, t, simulation):
         arg3 = pi*t/T
         c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
         v = c1 * (2.0*pi/Lx) * (2.0*np.sin(arg1)*np.cos(arg1)) * (np.cos(arg2))**2 * np.cos(arg3)
-        u = c1 * (pi/Ly) * (np.sin(arg1))**2 * (2.0*np.cos(arg2)*np.sin(arg2)) * (np.cos(arg3))
-        u = u - Lx/T
-        u = -u
         v = -v
-    return u, v
+    return v

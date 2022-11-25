@@ -76,7 +76,7 @@ def get_adv_parameters_2d(filename):
         confpar.readline()
         tc = confpar.readline()
         confpar.readline()
-        mono = confpar.readline()
+        flux_method = confpar.readline()
         confpar.readline()
 
         # Close the file
@@ -88,7 +88,7 @@ def get_adv_parameters_2d(filename):
         ic = int(ic)
         vf = int(vf)
         tc = int(tc)
-        mono = int(mono)
+        flux_method = int(flux_method)
 
         #Print the parameters on the screen
         print("\n--------------------------------------------------------")
@@ -96,9 +96,10 @@ def get_adv_parameters_2d(filename):
         print("Time step: ", dt)
         print("Initial condition: ", ic)
         print("Velocity field: ", vf)
+        print("Flux method: ", flux_method)
         print("--------------------------------------------------------\n")
 
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return  dt, Tf, tc, ic, vf, mono
+    return  dt, Tf, tc, ic, vf, flux_method

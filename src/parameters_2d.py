@@ -32,7 +32,7 @@ def grid_2d(x0, xf, N, y0, yf, M, ngl, ngr, ng):
 #  Simulation class
 ####################################################################################
 class simulation_adv_par_2d:
-    def __init__(self, N, M, dt, Tf, ic, vf, tc, mono):
+    def __init__(self, N, M, dt, Tf, ic, vf, tc, flux_method):
         # Number of cells in x direction
         self.N  = N
 
@@ -54,8 +54,8 @@ class simulation_adv_par_2d:
         # Total period definition
         self.Tf = Tf
 
-        # Monotonization
-        self.mono = mono
+        # Flux scheme
+        self.flux_method = flux_method
 
         # Define the domain extremes, advection velocity, etc
         if ic == 1:
@@ -81,13 +81,16 @@ class simulation_adv_par_2d:
         x0, xf = -np.pi, np.pi
         y0, yf = -np.pi*0.5, np.pi*0.5
 
-        # Monotonization:
-        if mono == 0:
-            monot = 'none'
-        elif mono == 1:
-            monot = 'CW84' # Collela and Woodward 84 paper
+
+        # Flux scheme
+        if flux_method == 1:
+            flux_method_name = 'PPM'
+        elif flux_method == 2:
+            flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+        elif flux_method == 3:
+            flux_method_name = 'PPM_hybrid' #Monotonization from Collela and Woodward 84 paper
         else:
-           print("Error - invalid monotization method")
+           print("Error - invalid flux method")
            exit()
 
         # Interval endpoints
@@ -114,8 +117,8 @@ class simulation_adv_par_2d:
         # IC name
         self.icname = name
 
-        # Monotonization method
-        self.monot = monot
+        # Flux method method
+        self.flux_method_name = flux_method_name
 
         # Finite volume method
         self.fvmethod = 'PPM'

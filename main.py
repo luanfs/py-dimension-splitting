@@ -29,8 +29,8 @@ N, M, eq = conf.get_test_parameters_2d('configuration.par')
 if eq == 1:
     # 2D advection test cases - parameters from par/configuration.par
     # Get parameters
-    dt, Tf, tc, ic, vf, mono = conf.get_adv_parameters_2d('advection.par')
-    simulation = simulation_adv_par_2d(N, M, dt, Tf, ic, vf, tc, mono)
+    dt, Tf, tc, ic, vf, flux_method = conf.get_adv_parameters_2d('advection.par')
+    simulation = simulation_adv_par_2d(N, M, dt, Tf, ic, vf, tc, flux_method)
 
     if tc == 1:
         # Advection routine
