@@ -5,8 +5,6 @@
 date=` date +%F `
 version=` date +%y.%m.%d `
 
-source sh/tarfiles.sh
-
 output="py-dimsplit$version.tar.bz2"
 bkpdir="dimsplit" 
 
