@@ -18,7 +18,8 @@ others="main.py\
 
 files="$sourcefiles $parfiles $scripts $others"
 
-output="py-dimsplit$version.tar.bz2"
+#output="py-opsplit$version.tar.bz2"
+output="py-opsplit.tar.bz2"
 
 tar cjfv $output $files
 

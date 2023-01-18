@@ -5,8 +5,9 @@
 date=` date +%F `
 version=` date +%y.%m.%d `
 
-output="py-dimsplit$version.tar.bz2"
-bkpdir="dimsplit" 
+#output="py-opsplit$version.tar.bz2"
+output="py-opsplit.tar.bz2"
+bkpdir="opsplit" 
 
 #Edit place to sync relative to system used
 dropdir="/home/luan/Dropbox/doc/code/"$bkpdir
