@@ -42,28 +42,24 @@ def qexact_adv_2d(x, y, t, simulation):
         Y = y
 
     if simulation.ic == 1:
-        z = np.sin(2.0*X)*np.sin(2.0*Y) + 1.0
+        z = np.sin(2.0*np.pi*X)*np.sin(2.0*np.pi*Y) + 1.0
 
     elif simulation.ic == 2:
-        z = np.exp(-5.0*(np.sin(X*0.5))**2)
-        z = z*np.exp(-5.0*(np.sin(Y))**2)
+        z = np.exp(-10.0*(np.cos(np.pi*X))**2)
+        z = z*np.exp(-10.0*(np.cos(np.pi*Y))**2)
 
     elif simulation.ic == 3:
-        maskx = np.logical_and(X>=-0.25*np.pi,X<=0.25*np.pi)
-        masky = np.logical_and(Y>=-0.125*np.pi,Y<=0.125*np.pi)
+        maskx = np.logical_and(X>=0.4,X<=0.6)
+        masky = np.logical_and(Y>=0.4,Y<=0.6)
         z = x*0
         z[np.logical_and(maskx, masky)] = 1.0
 
     elif simulation.ic == 4:
-        A = 0.2
-        Lx = 2*np.pi
-        x0 = -1*Lx/12.0
-        y0 = 0.0
-        x1 =  1*Lx/12.0
-        y1 = 0.0
-        z0 = 0.95*np.exp(-((x-x0)**2 + (y-y0)**2)/A)
-        z1 = 0.95*np.exp(-((x-x1)**2 + (y-y1)**2)/A)
-        z = z0 + z1
+        z1 = np.exp(-10.0*(np.cos(np.pi*(X-0.1)))**2)
+        z1 = z1*np.exp(-10.0*(np.cos(np.pi*Y))**2)
+        z2 = np.exp(-10.0*(np.cos(np.pi*(X+0.1)))**2)
+        z2 = z2*np.exp(-10.0*(np.cos(np.pi*Y))**2)
+        z = z1+z2
 
     elif simulation.ic == 5:
         z = np.ones(np.shape(x))
@@ -85,6 +81,9 @@ def u_velocity_adv_2d(x, y, t, simulation):
     if simulation.vf == 1:
         u = 0.2
     elif simulation.vf == 2:
+        T = 5.0
+        u = np.sin(np.pi*x)**2*np.sin(2.0*np.pi*y)*np.cos(np.pi*t/T)
+    elif simulation.vf == 3:
         phi_hat = 10
         T = 5
 
@@ -93,13 +92,18 @@ def u_velocity_adv_2d(x, y, t, simulation):
         Lx = twopi
         Ly = pi
 
-        arg1 = twopi*(x/Lx - t/T)
-        arg2 = pi*y/Ly
+        X = -np.pi + x*2.0*np.pi
+        Y = -np.pi*0.5 + y*np.pi
+        #X = x
+        #Y = y
+
+        arg1 = twopi*(X/Lx - t/T)
+        arg2 = pi*Y/Ly
         arg3 = pi*t/T
         c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
         u = c1 * (pi/Ly) * (np.sin(arg1))**2 * (2.0*np.cos(arg2)*np.sin(arg2)) * (np.cos(arg3))
         u = u - Lx/T
-        u = -u
+        u = -u/twopi
     return u
 
 ####################################################################################
@@ -107,8 +111,11 @@ def u_velocity_adv_2d(x, y, t, simulation):
 ####################################################################################
 def v_velocity_adv_2d(x, y, t, simulation):
     if simulation.vf == 1:
-        v = -0.1
+        v = -0.2
     elif simulation.vf == 2:
+        T = 5.0
+        v = -np.sin(np.pi*y)**2*np.sin(2.0*np.pi*x)*np.cos(np.pi*t/T)
+    elif simulation.vf == 3:
         phi_hat = 10
         T = 5
 
@@ -117,10 +124,15 @@ def v_velocity_adv_2d(x, y, t, simulation):
         Lx = twopi
         Ly = pi
 
-        arg1 = twopi*(x/Lx - t/T)
-        arg2 = pi*y/Ly
+        X = -np.pi + x*2.0*np.pi
+        Y = -np.pi*0.5 + y*np.pi
+        #X = x
+        #Y = y
+
+        arg1 = twopi*(X/Lx - t/T)
+        arg2 = pi*Y/Ly
         arg3 = pi*t/T
         c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
         v = c1 * (2.0*pi/Lx) * (2.0*np.sin(arg1)*np.cos(arg1)) * (np.cos(arg2))**2 * np.cos(arg3)
-        v = -v
+        v = -v/pi
     return v

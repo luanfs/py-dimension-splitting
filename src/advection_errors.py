@@ -20,13 +20,13 @@ def error_analysis_adv2d(simulation):
     vf = simulation.vf
 
     # Flux method
-    flux_method = simulation.flux_method
+    recon = simulation.recon
 
     # Test case
     tc = simulation.tc
 
     # CFL number for all simulations
-    CFL = 0.25
+    #CFL = 0.25
 
     # Interval
     x0 = simulation.x0
@@ -35,7 +35,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 6
+    Ntest = 5
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -47,13 +47,17 @@ def error_analysis_adv2d(simulation):
     dt = np.zeros(Ntest)
 
     u, v = velocity_adv_2d(x0, y0, 0, simulation)
+
     # Period
     if simulation.vf==1: # constant velocity
         Tf = 5.0
         dt[0] = 0.25
-    elif simulation.vf == 2: #deformational flow
+    elif simulation.vf == 2: # variable velocity
         Tf = 5.0
         dt[0] = 0.05
+    elif simulation.vf == 3: # variable velocity
+        Tf = 5.0
+        dt[0] = 0.10
     else:
         exit()
 
@@ -73,7 +77,7 @@ def error_analysis_adv2d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, flux_method)
+        simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, recon)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i] =  adv_2d(simulation, False)
@@ -83,8 +87,8 @@ def error_analysis_adv2d(simulation):
         print_errors_simul(error_linf, error_l1, error_l2, i)
 
     # Plot the errors
-    title = simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_errors.png'
+    title = simulation.title + '- ' + simulation.recon_name + ' - ' + simulation.icname
+    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.recon_name+'_ic'+str(ic)+'_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
     # Print message
@@ -92,6 +96,6 @@ def error_analysis_adv2d(simulation):
     print('Convergence graphs has been ploted in '+filename)
 
     # Plot the convergence rate
-    title = 'Convergence rate - ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate.png'
+    title = 'Convergence rate - ' + simulation.recon_name + ' - ' + simulation.icname
+    filename = graphdir+'2d_adv_tc'+str(tc)+'_'+simulation.recon_name+'_ic'+str(ic)+'_convergence_rate.png'
     plot_convergence_rate(N, error_linf, error_l1, error_l2, filename, title)

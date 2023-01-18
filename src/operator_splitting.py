@@ -1,5 +1,5 @@
 ####################################################################################
-# Dimension splitting operators implementation
+# Operator splitting implementation
 # Luan da Fonseca Santos - June 2022
 #
 # References:
@@ -17,10 +17,12 @@
 # u_edges (velocity in x direction at edges)
 # Formula 2.7 from Lin and Rood 1996
 ####################################################################################
-def F_operator(F, u_edges, flux_x, ax, cx, cx2, simulation):
+def F_operator(F, u_edges, flux_x, cx, simulation):
     N = simulation.N
+    i0 = simulation.i0
+    iend = simulation.iend
     #compute_flux_x(flux_x, Q, u_edges, ax, cx, cx2, simulation)
-    F[3:N+3,:] = -(simulation.dt/simulation.dx)*(u_edges[4:N+4,:]*flux_x[4:N+4,:] - u_edges[3:N+3,:]*flux_x[3:N+3,:])
+    F[i0:iend,:] = -(simulation.dt/simulation.dx)*(u_edges[i0+1:iend+1,:]*flux_x[i0+1:iend+1,:] - u_edges[i0:iend,:]*flux_x[i0:iend,:])
 
 ####################################################################################
 # Flux operator in y direction
@@ -28,8 +30,10 @@ def F_operator(F, u_edges, flux_x, ax, cx, cx2, simulation):
 # v_edges (velocity in y direction at edges)
 # Formula 2.8 from Lin and Rood 1996
 ####################################################################################
-def G_operator(G, v_edges, flux_y, ay, cy, cy2, simulation):
+def G_operator(G, v_edges, flux_y, cy, simulation):
     M = simulation.M
+    j0 = simulation.j0
+    jend = simulation.jend
     #compute_flux_y(flux_y, Q, v_edges, ay, cy, cy2, simulation)
-    G[:, 3:M+3] = -(simulation.dt/simulation.dy)*(v_edges[:,4:M+4]*flux_y[:,4:M+4] - v_edges[:,3:M+3]*flux_y[:,3:M+3])
+    G[:,j0:jend] = -(simulation.dt/simulation.dy)*(v_edges[:,j0+1:jend+1]*flux_y[:,j0+1:jend+1] - v_edges[:,j0:jend]*flux_y[:,j0:jend])
 

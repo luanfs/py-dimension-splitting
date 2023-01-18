@@ -17,8 +17,7 @@ from plot                import plot_2dfield_graphs
 from diagnostics         import diagnostics_adv_2d
 from output              import print_diagnostics_adv_2d, output_adv
 from parameters_2d       import graphdir
-from advection_ic        import q0_adv_2d, qexact_adv_2d, velocity_adv_2d
-from stencil             import flux_ppm_x_stencil_coefficients, flux_ppm_y_stencil_coefficients
+from advection_ic        import q0_adv_2d, qexact_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
 from cfl                 import cfl_x, cfl_y
 from errors import *
 from advection_timestep  import adv_timestep
@@ -45,7 +44,7 @@ def adv_2d(simulation, plot):
 
     tc = simulation.tc
     icname = simulation.icname
-    flux_method   = simulation.flux_method
+    recon   = simulation.recon
 
     # Ghost cells
     ngl = simulation.ngl
@@ -72,14 +71,17 @@ def adv_2d(simulation, plot):
     # edges
     Xu, Yu = np.meshgrid(x, yc,indexing='ij')
     Xv, Yv = np.meshgrid(xc, y,indexing='ij')
-    u_edges[:, :], _ = velocity_adv_2d(Xu, Yu, 0.0, simulation)
-    _, v_edges[:,:] = velocity_adv_2d(Xv, Yv, 0.0, simulation)
+
+    # Initial velocity
+    u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
+    v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
+
 
     # CFL at edges - x direction
-    cx, cx2 = cfl_x(u_edges, simulation)
+    cx = cfl_x(u_edges, simulation)
 
     # CFL at edges - y direction
-    cy, cy2 = cfl_y(v_edges, simulation)
+    cy = cfl_y(v_edges, simulation)
 
     # CFL number
     CFL_x = np.amax(cx)
@@ -95,14 +97,6 @@ def adv_2d(simulation, plot):
     # Flux at edges
     flux_x = np.zeros((N+ng+1, M+ng))
     flux_y = np.zeros((N+ng, M+ng+1))
-
-    # Stencil coefficients
-    ay = np.zeros((6, N+ng, M+ng+1))
-    ax = np.zeros((6, N+ng+1, M+ng))
-
-    # Compute the coefficients
-    flux_ppm_x_stencil_coefficients(u_edges, ax, cx, cx2, simulation)
-    flux_ppm_y_stencil_coefficients(v_edges, ay, cy, cy2, simulation)
 
     # Compute average values of Q (initial condition)
     Q = np.zeros((N+ng, M+ng))
@@ -137,7 +131,7 @@ def adv_2d(simulation, plot):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, u_edges, v_edges, F, G,  FQ, GQ, flux_x, flux_y, ax, cx, cx2, ay, y, cy2, Xu, Yu, Xv, Yv, t, simulation)
+        adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, flux_x, flux_y, cx, cy, Xu, Yu, Xv, Yv, t, simulation)
 
         # Output and plot
         output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
@@ -146,7 +140,7 @@ def adv_2d(simulation, plot):
     if plot:
         CFL  = str("{:.2e}".format(CFL))
         # Plot the error evolution graph
-        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.flux_method_name
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.flux_method_name+'_errors.png'
+        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name
+        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name+'_errors.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
     return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]

@@ -65,6 +65,7 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             y0 = simulation.y0
             yf = simulation.yf
             ic = simulation.ic
+            vf = simulation.vf
             tc = simulation.tc
             icname = simulation.icname
 
@@ -89,15 +90,15 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
                 Qmax =  2.1
             elif simulation.ic == 2 or simulation.ic == 4:
                 Qmin = -0.2
-                Qmax =  1.0
+                Qmax =  1.1
             elif simulation.ic == 3:
-                Qmin = -0.3
-                Qmax =  1.3
+                Qmin = -0.2
+                Qmax =  1.1
             elif simulation.ic == 5:
                 Qmin =  0.95
                 Qmax =  1.05
             # Plot
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
-            filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k)+'_N'+str(N)+'_'+simulation.flux_method_name+'.png'
-            title = '2D advection - '+icname+' - time='+time+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.flux_method_name+ ', Min = '+ qmin +', Max = '+qmax
+            filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+'_'+simulation.recon_name+'.png'
+            title = '2D advection - '+icname+' - time='+time+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name+ ', Min = '+ qmin +', Max = '+qmax
             plot_2dfield_graphs([Q[i0:iend,j0:jend]], [Qmin], [Qmax], ['jet'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)

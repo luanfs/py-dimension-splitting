@@ -32,7 +32,7 @@ def grid_2d(x0, xf, N, y0, yf, M, ngl, ngr, ng):
 #  Simulation class
 ####################################################################################
 class simulation_adv_par_2d:
-    def __init__(self, N, M, dt, Tf, ic, vf, tc, flux_method):
+    def __init__(self, N, M, dt, Tf, ic, vf, tc, recon):
         # Number of cells in x direction
         self.N  = N
 
@@ -55,7 +55,7 @@ class simulation_adv_par_2d:
         self.Tf = Tf
 
         # Flux scheme
-        self.flux_method = flux_method
+        self.recon = recon
 
         # Define the domain extremes, advection velocity, etc
         if ic == 1:
@@ -78,17 +78,18 @@ class simulation_adv_par_2d:
             exit()
 
         # Define the domain
-        x0, xf = -np.pi, np.pi
-        y0, yf = -np.pi*0.5, np.pi*0.5
-
+        x0, xf = 0.0, 1.0
+        y0, yf = 0.0, 1.0
 
         # Flux scheme
-        if flux_method == 1:
-            flux_method_name = 'PPM'
-        elif flux_method == 2:
-            flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
-        elif flux_method == 3:
-            flux_method_name = 'PPM_hybrid' #Monotonization from Collela and Woodward 84 paper
+        if recon == 1:
+            recon_name = 'PPM'
+        elif recon == 2:
+            recon_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+        elif recon == 3:
+            recon_name = 'PPM_hybrid' #Hybrid PPM from Putman and Lin 07 paper
+        elif recon == 4:
+            recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
         else:
            print("Error - invalid flux method")
            exit()
@@ -100,13 +101,19 @@ class simulation_adv_par_2d:
         self.yf = yf
 
         # Ghost cells variables
-        self.ngl = 3
-        self.ngr = 3
+        if recon <= 3:
+            self.ngl = 3
+            self.ngr = 3
+        elif recon == 4:
+            self.ngl = 4
+            self.ngr = 4
+
         self.ng  = self.ngl + self.ngr
 
         # Grid interior indexes
         self.i0   = self.ngl
         self.iend = self.ngl + N
+
         # Grid interior indexes
         self.j0   = self.ngl
         self.jend = self.ngl + M
@@ -118,7 +125,7 @@ class simulation_adv_par_2d:
         self.icname = name
 
         # Flux method method
-        self.flux_method_name = flux_method_name
+        self.recon_name = recon_name
 
         # Finite volume method
         self.fvmethod = 'PPM'
