@@ -25,42 +25,35 @@ from cfl import cfl_x, cfl_y
 # ax (stencil coefficients), cx, cx2 (CFL, CFL^2 in x direction)
 # Output: flux_x (flux in x direction)
 ####################################################################################
-def compute_flux_x(flux_x, Q, u_edges, cx, simulation):
+def compute_flux_x(Q, px, cx, simulation):
     N = simulation.N
 
     # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction_x(Q, simulation)
+    rec.ppm_reconstruction_x(Q, px, simulation)
 
     # Compute the fluxes
-    numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, cx, simulation)
-
+    numerical_flux_ppm_x(px, cx, simulation)
 
 ####################################################################################
 # PPM flux in x direction
 ####################################################################################
-def numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, cx, simulation):
+def numerical_flux_ppm_x(px, cx, simulation):
     N = simulation.N
     M = simulation.M
     ng = simulation.ng
     i0 = simulation.i0
     iend = simulation.iend
 
-    # Numerical fluxes at edges
-    f_L = np.zeros((N+ng+1, M+ng)) # Left
-    f_R = np.zeros((N+ng+1, M+ng)) # Right
-
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
-    cx = cfl_x(u_edges, simulation)
-
     # Flux at left edges
-    f_L[i0:iend+1,:] = q_R[i0-1:iend,:] - cx[i0:iend+1,:]*0.5*(dq[i0-1:iend,:] - (1.0-(2.0/3.0)*cx[i0:iend+1,:])*q6[i0-1:iend,:])
+    px.f_L[i0:iend+1,:] = px.q_R[i0-1:iend,:] - cx[i0:iend+1,:]*0.5*(px.dq[i0-1:iend,:] - (1.0-(2.0/3.0)*cx[i0:iend+1,:])*px.q6[i0-1:iend,:])
 
     # Flux at right edges
-    f_R[i0:iend+1,:] = q_L[i0:iend+1,:] - cx[i0:iend+1,:]*0.5*(dq[i0:iend+1,:] + (1.0+(2.0/3.0)*cx[i0:iend+1,:])*q6[i0:iend+1,:])
+    px.f_R[i0:iend+1,:] = px.q_L[i0:iend+1,:] - cx[i0:iend+1,:]*0.5*(px.dq[i0:iend+1,:] + (1.0+(2.0/3.0)*cx[i0:iend+1,:])*px.q6[i0:iend+1,:])
 
     # F - Formula 1.13 from Collela and Woodward 1984)
-    flux_x[u_edges[:,:] >= 0] = f_L[u_edges[:,:] >= 0]
-    flux_x[u_edges[:,:] <= 0] = f_R[u_edges[:,:] <= 0]
+    px.f_upw[cx[:,:] >= 0] = px.f_L[cx[:,:] >= 0]
+    px.f_upw[cx[:,:] <= 0] = px.f_R[cx[:,:] <= 0]
 
 ####################################################################################
 # Compute the 1d flux operator in y direction
@@ -68,51 +61,42 @@ def numerical_flux_ppm_x(q_R, q_L, dq, q6, u_edges, flux_x, cx, simulation):
 # ay (stencil coefficients), cy, cy2 (CFL, CFL^2 in y direction)
 # Output: flux_y (flux in y direction)
 ####################################################################################
-def compute_flux_y(flux_y, Q, v_edges, cy, simulation):
+def compute_flux_y(Q, py, cy, simulation):
     M = simulation.M
 
     # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction_y(Q, simulation)
+    rec.ppm_reconstruction_y(Q, py, simulation)
 
     # Compute the fluxes
-    numerical_flux_ppm_y(q_R, q_L, dq, q6, v_edges, cy, flux_y, simulation)
+    numerical_flux_ppm_y(py, cy, simulation)
 
 ####################################################################################
 # PPM flux in y direction
 ####################################################################################
-def numerical_flux_ppm_y(q_R, q_L, dq, q6, v_edges, cy, flux_y,  simulation):
+def numerical_flux_ppm_y(py, cy, simulation):
     N = simulation.N
     M = simulation.M
     ng = simulation.ng
     j0 = simulation.j0
     jend = simulation.jend
 
-
-    # Numerical fluxes at edges
-    g_L = np.zeros((N+ng, M+ng+1))# Left
-    g_R = np.zeros((N+ng, M+ng+1))# Rigth
-
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
-    cy = cfl_y(v_edges, simulation)
-
     # Flux at left edges
-    g_L[:,j0:jend+1] = q_R[:,j0-1:jend] - cy[:,j0:jend+1]*0.5*(dq[:,j0-1:jend] - (1.0-2.0/3.0*cy[:,j0:jend+1])*q6[:,j0-1:jend])
+    py.f_L[:,j0:jend+1] = py.q_R[:,j0-1:jend] - cy[:,j0:jend+1]*0.5*(py.dq[:,j0-1:jend] - (1.0-2.0/3.0*cy[:,j0:jend+1])*py.q6[:,j0-1:jend])
 
     # Flux at right edges
-    g_R[:,j0:jend+1] = q_L[:,j0:jend+1] - cy[:,j0:jend+1]*0.5*(dq[:,j0:jend+1] + (1.0+2.0/3.0*cy[:,j0:jend+1])*q6[:,j0:jend+1])
+    py.f_R[:,j0:jend+1] = py.q_L[:,j0:jend+1] - cy[:,j0:jend+1]*0.5*(py.dq[:,j0:jend+1] + (1.0+2.0/3.0*cy[:,j0:jend+1])*py.q6[:,j0:jend+1])
 
     # G - Formula 1.13 from Collela and Woodward 1984)
-    flux_y[v_edges[:,:] >= 0] = g_L[v_edges[:,:] >= 0]
-    flux_y[v_edges[:,:] <= 0] = g_R[v_edges[:,:] <= 0]
+    py.f_upw[cy[:,:] >= 0] = py.f_L[cy[:,:] >= 0]
+    py.f_upw[cy[:,:] <= 0] = py.f_R[cy[:,:] <= 0]
 
 ####################################################################################
 # Compute the fluxes needed for dimension spliting operators
 ####################################################################################
-def compute_fluxes(Q_x, Q_y, u_edges, v_edges, flux_x, flux_y, cx, cy, simulation):
-
-    compute_flux_x(flux_x, Q_x, u_edges, cx, simulation)
-
-    compute_flux_y(flux_y, Q_y, v_edges, cy, simulation)
+def compute_fluxes(Qx, Qy, px, py, cx, cy, simulation):
+    compute_flux_x(Qx, px, cx, simulation)
+    compute_flux_y(Qy, py, cy, simulation)
 
 """
 ####################################################################################

@@ -16,7 +16,7 @@ import numpy as np
 from plot                import plot_2dfield_graphs
 from diagnostics         import diagnostics_adv_2d
 from output              import print_diagnostics_adv_2d, output_adv
-from parameters_2d       import graphdir
+from parameters_2d       import graphdir, ppm_parabola
 from advection_ic        import q0_adv_2d, qexact_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
 from cfl                 import cfl_x, cfl_y
 from errors import *
@@ -76,7 +76,6 @@ def adv_2d(simulation, plot):
     u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
     v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
 
-
     # CFL at edges - x direction
     cx = cfl_x(u_edges, simulation)
 
@@ -111,6 +110,10 @@ def adv_2d(simulation, plot):
     Q[:,jend:N+ng] = Q[:,j0:j0+ngr]
     Q[:,0:j0]      = Q[:,M:M+ngl]
 
+    # PPM parabolas
+    px = ppm_parabola(simulation,'x')
+    py = ppm_parabola(simulation,'y')
+
     # Plotting var
     plotstep = int(Nsteps/5)
 
@@ -131,7 +134,7 @@ def adv_2d(simulation, plot):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, flux_x, flux_y, cx, cy, Xu, Yu, Xv, Yv, t, simulation)
+        adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, Yv, t, simulation)
 
         # Output and plot
         output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)

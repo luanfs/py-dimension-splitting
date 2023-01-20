@@ -139,3 +139,55 @@ class simulation_adv_par_2d:
             print("Error - invalid test case")
             exit()
 
+
+####################################################################################
+#  Parabola class
+####################################################################################
+class ppm_parabola:
+    def __init__(self, simulation, direction):
+        # Number of cells
+        N  = simulation.N
+        M  = simulation.M
+        ng = simulation.ng
+
+        # reconstruction name
+        self.recon_name = simulation.recon_name
+
+        # parabola coefficients
+        # Notation from Colella and  Woodward 1984
+        # q(x) = q_L + z*(dq + q6*(1-z)) z in [0,1]
+        self.q_L = np.zeros((N+ng, M+ng))
+        self.q_R = np.zeros((N+ng, M+ng))
+        self.dq  = np.zeros((N+ng, M+ng))
+        self.q6  = np.zeros((N+ng, M+ng))
+
+        if direction == 'x':
+            # parabola fluxes
+            self.f_L = np.zeros((N+ng+1, M+ng))  # flux from left
+            self.f_R = np.zeros((N+ng+1, M+ng))  # flux from right
+            self.f_upw = np.zeros((N+ng+1, M+ng)) # upwind flux
+
+            # Extra variables for each schem
+            if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
+                self.Q_edges =  np.zeros((N+ng+1, M+ng))
+        elif direction == 'y':
+            # parabola fluxes
+            self.f_L = np.zeros((N+ng, M+ng+1))   # flux from left
+            self.f_R = np.zeros((N+ng, M+ng+1))   # flux from right
+            self.f_upw = np.zeros((N+ng, M+ng+1)) # upwind flux
+
+            # Extra variables for each schem
+            if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
+                self.Q_edges =  np.zeros((N+ng, M+ng+1))
+
+        if simulation.recon_name == 'PPM_mono_CW84':
+            self.dQ  = np.zeros((N+ng, M+ng))
+            self.dQ0 = np.zeros((N+ng, M+ng))
+            self.dQ1 = np.zeros((N+ng, M+ng))
+            self.dQ2 = np.zeros((N+ng, M+ng))
+
+        if simulation.recon_name == 'PPM_mono_L04':
+            self.dQ      = np.zeros((N+ng, M+ng))
+            self.dQ_min  = np.zeros((N+ng, M+ng))
+            self.dQ_max  = np.zeros((N+ng, M+ng))
+            self.dQ_mono = np.zeros((N+ng, M+ng))
