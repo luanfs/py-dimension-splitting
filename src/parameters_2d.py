@@ -32,7 +32,7 @@ def grid_2d(x0, xf, N, y0, yf, M, ngl, ngr, ng):
 #  Simulation class
 ####################################################################################
 class simulation_adv_par_2d:
-    def __init__(self, N, M, dt, Tf, ic, vf, tc, recon):
+    def __init__(self, N, M, dt, Tf, ic, vf, tc, recon, opsplit):
         # Number of cells in x direction
         self.N  = N
 
@@ -56,6 +56,9 @@ class simulation_adv_par_2d:
 
         # Flux scheme
         self.recon = recon
+
+        # Operator splitting scheme
+        self.opsplit = opsplit
 
         # Define the domain extremes, advection velocity, etc
         if ic == 1:
@@ -93,6 +96,19 @@ class simulation_adv_par_2d:
         else:
            print("Error - invalid flux method")
            exit()
+
+        # Operator scheme
+        if opsplit == 1:
+            opsplit_name = 'L96' # Splitting from L96 paper
+        elif opsplit == 2:
+            opsplit_name = 'L04' # Splitting from L04 paper
+        elif opsplit == 3:
+            opsplit_name = 'PL07' #Splitting from Putman and Lin 07 paper
+        else:
+           print("Error - invalid operator splitting method")
+           exit()
+
+        self.opsplit_name = opsplit_name
 
         # Interval endpoints
         self.x0 = x0
@@ -167,7 +183,7 @@ class ppm_parabola:
             self.f_R = np.zeros((N+ng+1, M+ng))  # flux from right
             self.f_upw = np.zeros((N+ng+1, M+ng)) # upwind flux
 
-            # Extra variables for each schem
+            # Extra variables for each scheme
             if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
                 self.Q_edges =  np.zeros((N+ng+1, M+ng))
         elif direction == 'y':
@@ -176,9 +192,11 @@ class ppm_parabola:
             self.f_R = np.zeros((N+ng, M+ng+1))   # flux from right
             self.f_upw = np.zeros((N+ng, M+ng+1)) # upwind flux
 
-            # Extra variables for each schem
+            # Extra variables for each scheme
             if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
                 self.Q_edges =  np.zeros((N+ng, M+ng+1))
+
+        self.dF = np.zeros((N+ng, M+ng)) # div flux
 
         if simulation.recon_name == 'PPM_mono_CW84':
             self.dQ  = np.zeros((N+ng, M+ng))

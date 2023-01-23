@@ -4,10 +4,9 @@
 ####################################################################################
 
 import numpy as np
-from operator_splitting  import F_operator, G_operator
 from advection_ic        import velocity_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
-from flux                import compute_fluxes
 from cfl                 import cfl_x, cfl_y
+from discrete_operators  import divergence
 
 def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, Yv, t, simulation):
 
@@ -29,22 +28,11 @@ def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, 
     cx[:,:] = cfl_x(u_edges, simulation)
     cy[:,:] = cfl_y(v_edges, simulation)
 
-    # Compute the fluxes
-    compute_fluxes(Q, Q, px, py, cx, cy, simulation)
-
-    # Applies F and G operators
-    F_operator(FQ, u_edges, px.f_upw, cx, simulation)
-    G_operator(GQ, v_edges, py.f_upw, cy, simulation)
-
-    # Compute the fluxes again
-    compute_fluxes(Q + 0.5*GQ, Q + 0.5*FQ, px, py, cx, cy, simulation)
-
-    # Applies F and G operators again
-    F_operator(F, u_edges, px.f_upw, cx, simulation)
-    G_operator(G, v_edges, py.f_upw, cy, simulation)
+    # Compute the divergence
+    divergence(Q, u_edges, v_edges, px, py, cx, cy, simulation)
 
     # Update
-    Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] + F[i0:iend,j0:jend] + G[i0:iend,j0:jend]
+    Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] + px.dF[i0:iend,j0:jend] + py.dF[i0:iend,j0:jend]
 
     # Periodic boundary conditions
     # x direction

@@ -78,6 +78,9 @@ def get_adv_parameters_2d(filename):
         confpar.readline()
         recon = confpar.readline()
         confpar.readline()
+        opslit = confpar.readline()
+        confpar.readline()
+
 
         # Close the file
         confpar.close()
@@ -89,6 +92,7 @@ def get_adv_parameters_2d(filename):
         vf = int(vf)
         tc = int(tc)
         recon = int(recon)
+        opslit = int(opslit)
 
         #Print the parameters on the screen
         print("\n--------------------------------------------------------")
@@ -97,9 +101,10 @@ def get_adv_parameters_2d(filename):
         print("Initial condition: ", ic)
         print("Velocity field: ", vf)
         print("Reconstruction method: ", recon)
+        print("Operator splitting: ", opslit)
         print("--------------------------------------------------------\n")
 
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return  dt, Tf, tc, ic, vf, recon
+    return  dt, Tf, tc, ic, vf, recon, opslit

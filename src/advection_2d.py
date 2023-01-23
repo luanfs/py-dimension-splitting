@@ -144,6 +144,6 @@ def adv_2d(simulation, plot):
         CFL  = str("{:.2e}".format(CFL))
         # Plot the error evolution graph
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name+'_errors.png'
+        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name+'_split'+simulation.opsplit_name+'_errors.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
     return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]
