@@ -37,6 +37,15 @@ def qexact_adv_2d(x, y, t, simulation):
         Y = y-v*t
         mask = (Y != yf)
         Y[mask] = (Y[mask]-y0)%(yf-y0) + y0 # maps back to [y0,yf]
+    elif simulation.vf == 2:
+        a = -1.0/10.0
+        w = 8.0*np.pi
+        X = x
+        X = X - np.exp(a*t)*(w*np.sin(w*t)+a*np.cos(w*t))/(w*w+a*a)
+        X = X + a/(a*a+w*w)
+        Y = y
+        Y = Y - np.exp(a*t)*(w*np.sin(w*t)+a*np.cos(w*t))/(w*w+a*a)
+        Y = Y + a/(a*a+w*w)
     else:
         X = x
         Y = y
@@ -81,9 +90,13 @@ def u_velocity_adv_2d(x, y, t, simulation):
     if simulation.vf == 1:
         u = 0.2
     elif simulation.vf == 2:
+        w = 8.0*np.pi
+        a = -1.0/10.0
+        u = np.exp(a*t)*np.cos(w*t)*np.ones(np.shape(x))
+    elif simulation.vf == 3:
         T = 5.0
         u = np.sin(np.pi*x)**2*np.sin(2.0*np.pi*y)*np.cos(np.pi*t/T)
-    elif simulation.vf == 3:
+    elif simulation.vf == 4:
         phi_hat = 10
         T = 5
 
@@ -113,9 +126,13 @@ def v_velocity_adv_2d(x, y, t, simulation):
     if simulation.vf == 1:
         v = -0.2
     elif simulation.vf == 2:
+        w = 8.0*np.pi
+        a = -1.0/10.0
+        v = np.exp(a*t)*np.cos(w*t)*np.ones(np.shape(x))
+    elif simulation.vf == 3:
         T = 5.0
         v = -np.sin(np.pi*y)**2*np.sin(2.0*np.pi*x)*np.cos(np.pi*t/T)
-    elif simulation.vf == 3:
+    elif simulation.vf == 4:
         phi_hat = 10
         T = 5
 

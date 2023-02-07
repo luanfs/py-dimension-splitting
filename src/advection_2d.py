@@ -44,7 +44,8 @@ def adv_2d(simulation, plot):
 
     tc = simulation.tc
     icname = simulation.icname
-    recon   = simulation.recon
+    recon = simulation.recon
+    dp = simulation.dp
 
     # Ghost cells
     ngl = simulation.ngl
@@ -58,8 +59,8 @@ def adv_2d(simulation, plot):
     jend = simulation.jend
 
     # Velocity at edges
-    u_edges = np.zeros((N+ng+1, M+ng))
-    v_edges = np.zeros((N+ng, M+ng+1))
+    u_edges = np.zeros((N+ng+1, M+ng, simulation.tl))
+    v_edges = np.zeros((N+ng, M+ng+1, simulation.tl))
 
     # Number of time steps
     Nsteps = int(Tf/dt)
@@ -73,14 +74,23 @@ def adv_2d(simulation, plot):
     Xv, Yv = np.meshgrid(xc, y,indexing='ij')
 
     # Initial velocity
-    u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
-    v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
+    u_edges[:,:,0] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
+    v_edges[:,:,0] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
+    if dp == 2:
+        u_edges[:,:,1] = u_edges[:,:,0]
+        v_edges[:,:,1] = v_edges[:,:,0]
+    elif dp == 3:
+        u_edges[:,:,1] = u_edges[:,:,0]
+        u_edges[:,:,2] = u_edges[:,:,0]
+        v_edges[:,:,1] = v_edges[:,:,0]
+        v_edges[:,:,2] = v_edges[:,:,0]
+
 
     # CFL at edges - x direction
-    cx = cfl_x(u_edges, simulation)
+    cx = cfl_x(u_edges[:,:,0], simulation)
 
     # CFL at edges - y direction
-    cy = cfl_y(v_edges, simulation)
+    cy = cfl_y(v_edges[:,:,0], simulation)
 
     # CFL number
     CFL_x = np.amax(cx)
@@ -134,7 +144,7 @@ def adv_2d(simulation, plot):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, Yv, t, simulation)
+        adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
 
         # Output and plot
         output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
@@ -143,7 +153,8 @@ def adv_2d(simulation, plot):
     if plot:
         CFL  = str("{:.2e}".format(CFL))
         # Plot the error evolution graph
-        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name+'_split'+simulation.opsplit_name+'_errors.png'
+        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name+',dp = '+simulation.dp_name
+        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name+\
+        '_dp'+simulation.dp_name+'_split'+simulation.opsplit_name+'_errors.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
     return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]

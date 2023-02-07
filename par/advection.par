@@ -6,11 +6,13 @@
 #Initial condition
 4
 #Velocity
-3
+2
 #Test case
-1
+2
 #Reconstruction(1, 2, 3, 4)
 1
+#Departure point scheme (1, 2, 3)
+3
 #Operator splitting(1, 2, 3)
 1
 #-----------Description of parameters -------------------------------------
@@ -32,6 +34,10 @@
 #  case(2) - PPM with monotonization from Collela and Woodward 84 (CW84)
 #  case(3) - Hybrid PPM from Putman and Lin 2007(PL07)
 #  case(4) - PPM with monotonization from Lin 2004 (L04)
+# Possible departure point computation
+#  case(1) - Euler
+#  case(2) - Second-order Adams-Bashforth
+#  case(3) - Third-order Adams-Bashforth
 #Possible 2d operator splitting schemes
 #  case(1) - Splitting from Lin and Rood 1996 (L96)
 #  case(2) - Splitting from Lin 2004 (L04)

@@ -32,7 +32,7 @@ def grid_2d(x0, xf, N, y0, yf, M, ngl, ngr, ng):
 #  Simulation class
 ####################################################################################
 class simulation_adv_par_2d:
-    def __init__(self, N, M, dt, Tf, ic, vf, tc, recon, opsplit):
+    def __init__(self, N, M, dt, Tf, ic, vf, tc, recon, dp, opsplit):
         # Number of cells in x direction
         self.N  = N
 
@@ -56,6 +56,9 @@ class simulation_adv_par_2d:
 
         # Flux scheme
         self.recon = recon
+
+        # Departure point scheme
+        self.dp = dp
 
         # Operator splitting scheme
         self.opsplit = opsplit
@@ -95,6 +98,23 @@ class simulation_adv_par_2d:
             recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
         else:
            print("Error - invalid flux method")
+           exit()
+
+        # Departure point scheme
+        if dp == 1:
+            dp_name = 'Euler'
+            self.tl = 1 # Time levels
+
+        elif dp == 2:
+            dp_name = 'AB2'
+            self.tl = 2 # Time levels
+
+        elif dp == 3:
+            dp_name = 'AB3'
+            self.tl = 3 # Time levels
+
+        else:
+           print("Error in simulation_adv_par_1d - invalid departure point scheme", dp)
            exit()
 
         # Operator scheme
@@ -143,8 +163,8 @@ class simulation_adv_par_2d:
         # Flux method method
         self.recon_name = recon_name
 
-        # Finite volume method
-        self.fvmethod = 'PPM'
+        # Departure point method
+        self.dp_name = dp_name
 
         # Simulation title
         if tc == 1:

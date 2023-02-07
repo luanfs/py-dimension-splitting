@@ -19,8 +19,14 @@ def error_analysis_adv2d(simulation):
     # Velocity
     vf = simulation.vf
 
-    # Flux method
+    # Reconstruction method
     recon = simulation.recon
+
+    # Departure point method
+    dp = simulation.dp
+
+    # Operator splitting
+    opsplit = simulation.opsplit
 
     # Test case
     tc = simulation.tc
@@ -35,7 +41,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 5
+    Ntest = 4
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -53,9 +59,12 @@ def error_analysis_adv2d(simulation):
         Tf = 5.0
         dt[0] = 0.25
     elif simulation.vf == 2: # variable velocity
-        Tf = 5.0
+        Tf = np.pi
         dt[0] = 0.05
     elif simulation.vf == 3: # variable velocity
+        Tf = 5.0
+        dt[0] = 0.05
+    elif simulation.vf == 4: # variable velocity
         Tf = 5.0
         dt[0] = 0.10
     else:
@@ -77,7 +86,7 @@ def error_analysis_adv2d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, recon)
+        simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, recon, dp, opsplit)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i] =  adv_2d(simulation, False)
