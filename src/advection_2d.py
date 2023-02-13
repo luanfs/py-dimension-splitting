@@ -59,8 +59,8 @@ def adv_2d(simulation, plot):
     jend = simulation.jend
 
     # Velocity at edges
-    u_edges = np.zeros((N+ng+1, M+ng, simulation.tl))
-    v_edges = np.zeros((N+ng, M+ng+1, simulation.tl))
+    u_edges = np.zeros((N+ng+1, M+ng))
+    v_edges = np.zeros((N+ng, M+ng+1))
 
     # Number of time steps
     Nsteps = int(Tf/dt)
@@ -74,23 +74,14 @@ def adv_2d(simulation, plot):
     Xv, Yv = np.meshgrid(xc, y,indexing='ij')
 
     # Initial velocity
-    u_edges[:,:,0] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
-    v_edges[:,:,0] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
-    if dp == 2:
-        u_edges[:,:,1] = u_edges[:,:,0]
-        v_edges[:,:,1] = v_edges[:,:,0]
-    elif dp == 3:
-        u_edges[:,:,1] = u_edges[:,:,0]
-        u_edges[:,:,2] = u_edges[:,:,0]
-        v_edges[:,:,1] = v_edges[:,:,0]
-        v_edges[:,:,2] = v_edges[:,:,0]
-
+    u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
+    v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
 
     # CFL at edges - x direction
-    cx = cfl_x(u_edges[:,:,0], simulation)
+    cx = cfl_x(u_edges[:,:], simulation)
 
     # CFL at edges - y direction
-    cy = cfl_y(v_edges[:,:,0], simulation)
+    cy = cfl_y(v_edges[:,:], simulation)
 
     # CFL number
     CFL_x = np.amax(cx)
@@ -102,10 +93,6 @@ def adv_2d(simulation, plot):
     GQ = np.zeros((N+ng, M+ng))
     F  = np.zeros((N+ng, M+ng))
     G  = np.zeros((N+ng, M+ng))
-
-    # Flux at edges
-    flux_x = np.zeros((N+ng+1, M+ng))
-    flux_y = np.zeros((N+ng, M+ng+1))
 
     # Compute average values of Q (initial condition)
     Q = np.zeros((N+ng, M+ng))

@@ -41,7 +41,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 4
+    Ntest = 7
 
     # Number of cells
     N = np.zeros(Ntest)
