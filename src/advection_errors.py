@@ -40,7 +40,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 6
+    Ntest = 5
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -67,13 +67,13 @@ def error_analysis_adv2d(simulation):
         exit()
 
     # Errors array
-    recons = (1,4)
-    deps = (1,2)
-    split = (1,3)
+    #recons = (1,4)
+    #deps = (1,2)
+    #split = (1,3)
 
-    #recons = (simulation.recon,)
-    #deps = (simulation.dp,)
-    #split = (simulation.opsplit,)
+    recons = (simulation.recon,)
+    deps = (simulation.dp,)
+    split = (simulation.opsplit,)
 
     recon_names = ['PPM', 'mono_CW84','PPM_hybrid','mono_L04']
     dp_names = ['Euler', 'RK3']

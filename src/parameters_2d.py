@@ -49,7 +49,9 @@ class simulation_adv_par_2d:
         self.tc = tc
 
         # Time step
-        self.dt = dt
+        self.dt    = dt
+        self.dto2  = dt*0.5
+        self.twodt = dt*2.0
 
         # Total period definition
         self.Tf = Tf
@@ -86,6 +88,7 @@ class simulation_adv_par_2d:
         if vf >= 4:
             print("Error - invalid vector field", vf)
             exit()
+
         # Define the domain
         x0, xf = 0.0, 1.0
         y0, yf = 0.0, 1.0
@@ -151,6 +154,15 @@ class simulation_adv_par_2d:
 
         # Grid
         self.x, self.xc, self.dx, self.y, self.yc, self.dy = grid_2d(x0, xf, N, y0, yf, M, self.ngl, self.ngr, self.ng)
+
+        # RK vars
+        if dp == 2:
+            self.K1u = np.zeros((N+self.ng+1,M+self.ng))
+            self.K2u = np.zeros((N+self.ng+1,M+self.ng))
+            self.K3u = np.zeros((N+self.ng+1,M+self.ng))
+            self.K1u = np.zeros((N+self.ng,M+self.ng+1))
+            self.K2u = np.zeros((N+self.ng,M+self.ng+1))
+            self.K3u = np.zeros((N+self.ng,M+self.ng+1))
 
         # IC name
         self.icname = name
