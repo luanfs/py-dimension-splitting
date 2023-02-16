@@ -6,7 +6,7 @@
 #Initial condition
 4
 #Velocity
-4
+3
 #Test case
 1
 #Reconstruction(1, 2, 3, 4)
@@ -25,7 +25,7 @@
 #Possible velocity fields
 #  case(1) - constant velocity
 #  case(2) - deformational flow velocity (Nair et al 2010)
-#  case(2) - deformational flow velocity (Nair et al 2010)
+#  case(3) - deformational flow velocity (Nair et al 2010)
 #Possible test cases
 #  case(1) - Advection simulation
 #  case(2) - Convergence of error for advection equation

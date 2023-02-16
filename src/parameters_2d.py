@@ -80,9 +80,12 @@ class simulation_adv_par_2d:
             name = 'Constant field'
 
         else:
-            print("Error - invalid initial condition")
+            print("Error - invalid initial condition", ic)
             exit()
 
+        if vf >= 4:
+            print("Error - invalid vector field", vf)
+            exit()
         # Define the domain
         x0, xf = 0.0, 1.0
         y0, yf = 0.0, 1.0

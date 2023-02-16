@@ -84,9 +84,9 @@ def adv_2d(simulation, plot):
     cy = cfl_y(v_edges[:,:], simulation)
 
     # CFL number
-    CFL_x = np.amax(cx)
-    CFL_y = np.amax(cy)
-    CFL = np.sqrt(CFL_x**2 + CFL_y**2)
+    CFL_x = np.amax(abs(cx))
+    CFL_y = np.amax(abs(cy))
+    CFL = max(CFL_x, CFL_y)
 
     # Dimension splitting variables
     FQ = np.zeros((N+ng, M+ng))
