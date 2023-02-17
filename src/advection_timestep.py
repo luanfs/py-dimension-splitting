@@ -9,8 +9,7 @@ from cfl                 import cfl_x, cfl_y
 from discrete_operators  import divergence
 from averaged_velocity import time_averaged_velocity
 
-def adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation):
-
+def adv_timestep(Q, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation):
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
 

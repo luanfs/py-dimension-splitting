@@ -95,12 +95,6 @@ def adv_2d(simulation, plot, accuracytest_flag=None):
     CFL_y = np.amax(abs(cy))
     CFL = max(CFL_x, CFL_y)
 
-    # Dimension splitting variables
-    FQ = np.zeros((N+ng, M+ng))
-    GQ = np.zeros((N+ng, M+ng))
-    F  = np.zeros((N+ng, M+ng))
-    G  = np.zeros((N+ng, M+ng))
-
     # Compute average values of Q (initial condition)
     Q = np.zeros((N+ng, M+ng))
     Q[i0:iend,j0:jend] = q0_adv_2d(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation)
@@ -135,7 +129,7 @@ def adv_2d(simulation, plot, accuracytest_flag=None):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, u_edges, v_edges, F, G, FQ, GQ, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
+        adv_timestep(Q, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
 
         # Output and plot
         output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
