@@ -18,15 +18,16 @@ from miscellaneous           import createDirs
 from advection_2d            import adv_2d
 from parameters_2d           import simulation_adv_par_2d
 from advection_errors        import error_analysis_adv2d
+from operator_accuracy       import error_analysis_div
 
 # Create directories
 createDirs()
 
 # Get parameters
-N, M, eq = conf.get_test_parameters_2d('configuration.par')
+N, M, problem = conf.get_test_parameters_2d('configuration.par')
 
 # Select test case
-if eq == 1:
+if problem == 1:
     # 2D advection test cases - parameters from par/configuration.par
     # Get parameters
     dt, Tf, tc, ic, vf, flux_method, dp, opsplit = conf.get_adv_parameters_2d('advection.par')
@@ -42,8 +43,15 @@ if eq == 1:
         print('Invalid testcase!\n')
         exit()
 
-elif eq == 2:
+elif problem == 2:
     print('Not implemented yet.')
+
+elif problem == 3:
+    # test the divergence error
+    # Get parameters
+    dt, Tf, tc, ic, vf, flux_method, dp, opsplit = conf.get_adv_parameters_2d('advection.par')
+    simulation = simulation_adv_par_2d(N, M, dt, Tf, ic, vf, tc, flux_method, dp, opsplit)
+    error_analysis_div(simulation)
 
 else:
     print('Invalid testcase!\n')

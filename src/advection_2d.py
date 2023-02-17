@@ -22,7 +22,7 @@ from cfl                 import cfl_x, cfl_y
 from errors import *
 from advection_timestep  import adv_timestep
 
-def adv_2d(simulation, plot):
+def adv_2d(simulation, plot, accuracytest_flag=None):
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
     ic = simulation.ic   # Initial condition
@@ -64,6 +64,13 @@ def adv_2d(simulation, plot):
 
     # Number of time steps
     Nsteps = int(Tf/dt)
+    # Plotting var
+    plotstep = int(Nsteps/5)
+
+
+    if (accuracytest_flag):
+        Nsteps = 1
+        plotstep = 1
 
     # Grid
     Xc, Yc = np.meshgrid(xc, yc, indexing='ij')
@@ -110,9 +117,6 @@ def adv_2d(simulation, plot):
     # PPM parabolas
     px = ppm_parabola(simulation,'x')
     py = ppm_parabola(simulation,'y')
-
-    # Plotting var
-    plotstep = int(Nsteps/5)
 
     # Compute initial mass
     total_mass0, _ = diagnostics_adv_2d(Q, simulation, 1.0)

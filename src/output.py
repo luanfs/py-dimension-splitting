@@ -97,10 +97,40 @@ def output_adv(Xc, Yc, simulation, Q, error_linf, error_l1, error_l2, plot, k, t
             elif simulation.ic == 5:
                 Qmin =  0.95
                 Qmax =  1.05
-            # Plot
+
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
-            filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+'_'+\
-            simulation.recon_name+'_dp'+simulation.dp_name+'_split'+simulation.opsplit_name+'.png'
-            title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+',\n N='+str(N)+', '\
-            +simulation.recon_name+', splitting = '+simulation.opsplit_name +' , Min = '+ qmin +', Max = '+qmax
-            plot_2dfield_graphs([Q[i0:iend,j0:jend]], [Qmin], [Qmax], ['jet'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+
+            # Plot scalar field
+            if simulation.ic <=4:
+                filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+'_'+\
+                simulation.recon_name+'_dp'+simulation.dp_name+'_split'+simulation.opsplit_name+'.png'
+                title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+',\n N='+str(N)+', '\
+                +simulation.recon_name+', splitting = '+simulation.opsplit_name +', dp = '+simulation.dp_name+\
+                ' , Min = '+ qmin +', Max = '+qmax
+                plot_2dfield_graphs([Q[i0:iend,j0:jend]], [Qmin], [Qmax], ['jet'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+
+                # plot final error
+                if k == Nsteps:
+                    filename = graphdir+'2d_adv_error_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+'_'+\
+                    simulation.recon_name+'_dp'+simulation.dp_name+'_split'+simulation.opsplit_name+'.png'
+                    title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+',\n N='+str(N)+', '\
+                    +simulation.recon_name+', splitting = '+simulation.opsplit_name+', dp = '+simulation.dp_name
+
+                    error = q_exact-Q[i0:iend,j0:jend]
+                    emin = np.amin(error)
+                    emax = np.amax(error)
+                    plot_2dfield_graphs([error], [emin], [emax], ['seismic'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+
+            # Plot  error div field - only when ic = 5 (constant)
+            elif simulation.ic == 5:
+                filename = graphdir+'2d_adv_error_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+'_'+\
+                simulation.recon_name+'_dp'+simulation.dp_name+'_split'+simulation.opsplit_name+'.png'
+                title = 'Divergence error, velocity = '+str(vf)+', CFL='+str(CFL)+', N='+str(N)+'\n '\
+                +simulation.recon_name+', splitting = '+simulation.opsplit_name+', dp = '+simulation.dp_name
+                error = q_exact-Q[i0:iend,j0:jend]
+                emin = np.amin(error)
+                emax = np.amax(error)
+                plot_2dfield_graphs([error], [emin], [emax], ['seismic'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+            else:
+                print('Output error: invalid IC, ',simulation.ic)
+                exit()

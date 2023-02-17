@@ -25,7 +25,7 @@ def get_test_parameters_2d(filename):
         confpar.readline()
         M = confpar.readline()
         confpar.readline()
-        eq = confpar.readline()
+        problem = confpar.readline()
         confpar.readline()
 
         # Close the file
@@ -34,26 +34,30 @@ def get_test_parameters_2d(filename):
         # Convert from str to int
         N  = int(N)
         M  = int(M)
-        eq = int(eq)
+        problem = int(problem)
 
-        if eq == 1:
-            eqname = 'Advection'
-        elif eq == 2:
-            eqname = 'Shallow-water'
-
+        if problem == 1:
+            problem_name = 'advection'
+        elif problem == 2:
+            problem_name = 'shallow water'
+        elif problem == 3:
+            problem_name = 'divergence testing'
+        else:
+            print('ERROR in get_parameters: invalid problem')
+            exit()
         #Print the parameters on the screen
         print("\n--------------------------------------------------------")
         print("Parameters from file", file_path,"\n")
         print("Number of cells in x direction: ", N)
         print("Number of cells in y direction: ", M)
-        print("Equation: ", eqname)
+        print("Problem: ", problem_name)
         print("--------------------------------------------------------\n")
 
 
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return N, M, eq
+    return N, M, problem
 
 def get_adv_parameters_2d(filename):
     # The standard file filename.par must exist in par/ directory

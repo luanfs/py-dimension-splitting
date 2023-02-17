@@ -3,8 +3,9 @@
 100
 #Number of cells M (y direction)
 100
-#Equation to be solved (1 or 2)
-1
+#Problem to be solved (1, 2, 3)
+3
 #-----------Description of parameters -------------------------------------
 #  case(1) - Linear advection equation (see advection.par)
 #  case(2) - Non linear shallow water equations (see sw.par)
+#  case(3) - Divergence error testing (define wind, methods, etc, in advection.par)
