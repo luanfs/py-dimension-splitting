@@ -95,20 +95,20 @@ class simulation_adv_par_2d:
 
         # Flux scheme
         if recon == 1:
-            recon_name = 'PPM'
+            recon_name = 'PPM-0'
         elif recon == 2:
-            recon_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+            recon_name = 'PPM-CW84' #Monotonization from Collela and Woodward 84 paper
         elif recon == 3:
-            recon_name = 'PPM_hybrid' #Hybrid PPM from Putman and Lin 07 paper
+            recon_name = 'PPM-PL07' #Hybrid PPM from Putman and Lin 07 paper
         elif recon == 4:
-            recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
+            recon_name = 'PPM-L04' #Monotonization from Lin 04 paper
         else:
            print("Error - invalid flux method")
            exit()
 
         # Departure point scheme
         if dp == 1:
-            dp_name = 'Euler'
+            dp_name = 'RK1'
         elif dp == 2:
             dp_name = 'RK3'
         else:
@@ -117,11 +117,11 @@ class simulation_adv_par_2d:
 
         # Operator scheme
         if opsplit == 1:
-            opsplit_name = 'L96' # Splitting from L96 paper
+            opsplit_name = 'SP-AVLT' # Splitting from L96 paper (average lie-trotter splitting)
         elif opsplit == 2:
-            opsplit_name = 'L04' # Splitting from L04 paper
+            opsplit_name = 'SP-L04' # Splitting from L04 paper
         elif opsplit == 3:
-            opsplit_name = 'PL07' #Splitting from Putman and Lin 07 paper
+            opsplit_name = 'SP-PL07' #Splitting from Putman and Lin 07 paper
         else:
            print("Error - invalid operator splitting method")
            exit()
@@ -211,7 +211,7 @@ class ppm_parabola:
             self.f_upw = np.zeros((N+ng+1, M+ng)) # upwind flux
 
             # Extra variables for each scheme
-            if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
+            if simulation.recon_name == 'PPM-0' or simulation.recon_name == 'PPM-CW84' or simulation.recon_name == 'PPM-L04':
                 self.Q_edges =  np.zeros((N+ng+1, M+ng))
         elif direction == 'y':
             # parabola fluxes
@@ -220,18 +220,18 @@ class ppm_parabola:
             self.f_upw = np.zeros((N+ng, M+ng+1)) # upwind flux
 
             # Extra variables for each scheme
-            if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
+            if simulation.recon_name == 'PPM-0' or simulation.recon_name == 'PPM-CW84' or simulation.recon_name == 'PPM-L04':
                 self.Q_edges =  np.zeros((N+ng, M+ng+1))
 
         self.dF = np.zeros((N+ng, M+ng)) # div flux
 
-        if simulation.recon_name == 'PPM_mono_CW84':
+        if simulation.recon_name == 'PPM-CW84':
             self.dQ  = np.zeros((N+ng, M+ng))
             self.dQ0 = np.zeros((N+ng, M+ng))
             self.dQ1 = np.zeros((N+ng, M+ng))
             self.dQ2 = np.zeros((N+ng, M+ng))
 
-        if simulation.recon_name == 'PPM_mono_L04':
+        if simulation.recon_name == 'PPM-L04':
             self.dQ      = np.zeros((N+ng, M+ng))
             self.dQ_min  = np.zeros((N+ng, M+ng))
             self.dQ_max  = np.zeros((N+ng, M+ng))

@@ -11,6 +11,7 @@
 ####################################################################################
 
 import numpy as np
+import numexpr as ne
 ####################################################################################
 # Initial condition
 ####################################################################################
@@ -78,31 +79,41 @@ def velocity_adv_2d(x, y, t, simulation):
 # Velocity field - u component
 ####################################################################################
 def u_velocity_adv_2d(x, y, t, simulation):
+    pi = np.pi
     if simulation.vf == 1:
         u = 0.2
     elif simulation.vf == 2:
-        T = 5.0
-        u = np.sin(np.pi*x)**2*np.sin(2.0*np.pi*y)*np.cos(np.pi*t/T)
+        T = 5
+        #u = np.sin(np.pi*x)**2*np.sin(2.0*np.pi*y)*np.cos(np.pi*t/T)
+        u = ne.evaluate('sin(pi*x)**2*sin(2.0*pi*y)*cos(pi*t/T)')
+
     elif simulation.vf == 3:
         phi_hat = 10
         T = 5
 
         pi = np.pi
         twopi = pi*2.0
+        pio2  = pi*0.5
         Lx = twopi
         Ly = pi
 
-        X = -np.pi + x*2.0*np.pi
-        Y = -np.pi*0.5 + y*np.pi
-        #X = x
-        #Y = y
+        #X = -np.pi + x*2.0*np.pi
+        X = ne.evaluate('-pi + x*twopi')
+        #Y = -np.pi*0.5 + y*np.pi
+        Y = ne.evaluate('-pio2 + y*pi')
 
-        arg1 = twopi*(X/Lx - t/T)
-        arg2 = pi*Y/Ly
-        arg3 = pi*t/T
-        c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
-        u = c1 * (pi/Ly) * (np.sin(arg1))**2 * (2.0*np.cos(arg2)*np.sin(arg2)) * (np.cos(arg3))
-        u = u - Lx/T
+        #arg1 = twopi*(X/Lx - t/T)
+        arg1 = ne.evaluate('twopi*(X/Lx - t/T)')
+        #arg2 = pi*Y/Ly
+        arg2 = ne.evaluate('pi*Y/Ly')
+        #arg3 = pi*t/T
+        arg3 = ne.evaluate('pi*t/T')
+        #c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
+        c1 = ne.evaluate('(phi_hat/T)*(Lx/(2*pi))**2')
+        #u = c1 * (pi/Ly) * (np.sin(arg1))**2 * (2.0*np.cos(arg2)*np.sin(arg2)) * (np.cos(arg3))
+        u = ne.evaluate('c1*(pi/Ly)*(sin(arg1))**2*(2.0*cos(arg2)*sin(arg2))*(cos(arg3))')
+        #u = u - Lx/T
+        u = ne.evaluate('u - Lx/T')
         u = -u/twopi
     return u
 
@@ -110,29 +121,38 @@ def u_velocity_adv_2d(x, y, t, simulation):
 # Velocity field - v component
 ####################################################################################
 def v_velocity_adv_2d(x, y, t, simulation):
+    pi = np.pi
     if simulation.vf == 1:
         v = -0.2
     elif simulation.vf == 2:
         T = 5.0
-        v = -np.sin(np.pi*y)**2*np.sin(2.0*np.pi*x)*np.cos(np.pi*t/T)
+        #v = -np.sin(np.pi*y)**2*np.sin(2.0*np.pi*x)*np.cos(np.pi*t/T)
+        v = -ne.evaluate('sin(pi*y)**2*sin(2.0*pi*x)*cos(pi*t/T)')
     elif simulation.vf == 3:
         phi_hat = 10
         T = 5
 
         pi = np.pi
         twopi = pi*2.0
+        pio2 = pi*0.5
         Lx = twopi
         Ly = pi
 
-        X = -np.pi + x*2.0*np.pi
-        Y = -np.pi*0.5 + y*np.pi
-        #X = x
-        #Y = y
+        #X = -np.pi + x*2.0*np.pi
+        X = ne.evaluate('-pi + x*twopi')
+        #Y = -np.pi*0.5 + y*np.pi
+        Y = ne.evaluate('-pio2 + y*pi')
 
-        arg1 = twopi*(X/Lx - t/T)
-        arg2 = pi*Y/Ly
-        arg3 = pi*t/T
-        c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
-        v = c1 * (2.0*pi/Lx) * (2.0*np.sin(arg1)*np.cos(arg1)) * (np.cos(arg2))**2 * np.cos(arg3)
+        #arg1 = twopi*(X/Lx - t/T)
+        arg1 = ne.evaluate('twopi*(X/Lx - t/T)')
+        #arg2 = pi*Y/Ly
+        arg2 = ne.evaluate('pi*Y/Ly')
+        #arg3 = pi*t/T
+        arg3 = ne.evaluate('pi*t/T')
+
+        #c1 = (phi_hat/T)*(Lx/(2*np.pi))**2
+        c1 = ne.evaluate('(phi_hat/T)*(Lx/(2*pi))**2')
+        #v = c1 * (2.0*pi/Lx) * (2.0*np.sin(arg1)*np.cos(arg1)) * (np.cos(arg2))**2 * np.cos(arg3)
+        v = ne.evaluate('c1*(2.0*pi/Lx)*(2.0*sin(arg1)*cos(arg1))*((cos(arg2))**2)*cos(arg3)')
         v = -v/pi
     return v

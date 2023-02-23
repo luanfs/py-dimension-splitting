@@ -7,9 +7,10 @@ import numpy as np
 from advection_ic        import velocity_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
 from cfl                 import cfl_x, cfl_y
 from discrete_operators  import divergence
-from averaged_velocity import time_averaged_velocity
+from averaged_velocity   import time_averaged_velocity
+import numexpr as ne
 
-def adv_timestep(Q, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation):
+def adv_timestep(Q, div, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation):
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
 
@@ -32,10 +33,13 @@ def adv_timestep(Q, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simu
     cy[:,:] = cfl_y(v_edges[:,:], simulation)
 
     # Compute the divergence
-    divergence(Q, u_edges[:,:], v_edges[:,:], px, py, cx, cy, simulation)
+    divergence(Q, div, px, py, cx, cy, simulation)
 
     # Update
-    Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] + px.dF[i0:iend,j0:jend] + py.dF[i0:iend,j0:jend]
+    #Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] - div[i0:iend,j0:jend]
+    Q0 = Q[i0:iend,j0:jend]
+    d0 = -div[i0:iend,j0:jend]
+    Q[i0:iend,j0:jend] = ne.evaluate('Q0+d0')
 
     # Periodic boundary conditions
     # x direction

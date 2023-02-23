@@ -35,7 +35,7 @@ if problem == 1:
 
     if tc == 1:
         # Advection routine
-        adv_2d(simulation, True)
+        adv_2d(simulation, True, False)
     elif tc == 2:
         # Advection error analysis
         error_analysis_adv2d(simulation)

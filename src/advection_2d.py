@@ -22,7 +22,7 @@ from cfl                 import cfl_x, cfl_y
 from errors import *
 from advection_timestep  import adv_timestep
 
-def adv_2d(simulation, plot, accuracytest_flag=None):
+def adv_2d(simulation, plot, divtest_flag):
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
     ic = simulation.ic   # Initial condition
@@ -67,8 +67,7 @@ def adv_2d(simulation, plot, accuracytest_flag=None):
     # Plotting var
     plotstep = int(Nsteps/5)
 
-
-    if (accuracytest_flag):
+    if (divtest_flag):
         Nsteps = 1
         plotstep = 1
 
@@ -97,6 +96,7 @@ def adv_2d(simulation, plot, accuracytest_flag=None):
 
     # Compute average values of Q (initial condition)
     Q = np.zeros((N+ng, M+ng))
+    div = np.zeros((N+ng, M+ng))
     Q[i0:iend,j0:jend] = q0_adv_2d(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation)
 
     # Periodic boundary conditions
@@ -121,7 +121,8 @@ def adv_2d(simulation, plot, accuracytest_flag=None):
     error_l2   = np.zeros(Nsteps+1)
 
     # Initial plotting
-    output_adv(Xc[i0:iend,j0:jend] , Yc[i0:iend,j0:jend] , simulation, Q, error_linf, error_l1, error_l2, plot, 0, 0.0, Nsteps, plotstep, total_mass0, CFL)
+    if (not divtest_flag):
+        output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, div, error_linf, error_l1, error_l2, plot, 0, 0.0, Nsteps, plotstep, total_mass0, CFL, divtest_flag)
 
     # Time looping
     for k in range(1, Nsteps+1):
@@ -129,10 +130,10 @@ def adv_2d(simulation, plot, accuracytest_flag=None):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
+        adv_timestep(Q, div, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
 
         # Output and plot
-        output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
+        output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, div, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL, divtest_flag)
     #---------------------------------------End of time loop---------------------------------------
 
     if plot:

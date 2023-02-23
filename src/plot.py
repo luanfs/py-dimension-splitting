@@ -15,6 +15,8 @@ from errors import *
 ####################################################################################
 def plot_2dfield_graphs(scalar_fields, scalar_fieldsmin, scalar_fieldsmax, cmaps, xplot, yplot, vector_fieldsu, vector_fieldsv, xv, yv, filename, title):
     n = len(scalar_fields)
+    #figformat = 'pdf'
+    figformat = 'png'
     for k in range(0, n):
         plt.contourf(xplot, yplot, scalar_fields[k], cmap=cmaps[k], levels=np.linspace(scalar_fieldsmin[k],scalar_fieldsmax[k],101))
         plt.colorbar(orientation='vertical', fraction=0.046, pad=0.04)
@@ -24,5 +26,5 @@ def plot_2dfield_graphs(scalar_fields, scalar_fieldsmin, scalar_fieldsmax, cmaps
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title(title)
-        plt.savefig(filename)
+        plt.savefig(filename+'.'+figformat, format=figformat)
         plt.close()

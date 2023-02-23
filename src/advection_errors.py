@@ -40,7 +40,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 8
+    Ntest = 4
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -67,17 +67,17 @@ def error_analysis_adv2d(simulation):
         exit()
 
     # Errors array
-    #recons = (1,4)
-    #deps = (1,2)
-    #split = (1,3)
+    recons = (1,4)
+    deps = (1,2)
+    split = (1,3)
 
-    recons = (simulation.recon,)
-    deps = (simulation.dp,)
-    split = (simulation.opsplit,)
+    #recons = (simulation.recon,)
+    #deps = (simulation.dp,)
+    #split = (simulation.opsplit,)
 
-    recon_names = ['PPM', 'mono_CW84','PPM_hybrid','mono_L04']
-    dp_names = ['Euler', 'RK3']
-    sp_names = ['L96', 'L04', 'PL07']
+    recon_names = ['PPM-0', 'PPM-CW84','PPM-PL07','PPM-L04']
+    dp_names = ['RK1', 'RK3']
+    sp_names = ['SP-AVLT', 'SP-L04', 'SP-PL07']
     error_linf = np.zeros((Ntest, len(recons), len(split), len(deps)))
     error_l1   = np.zeros((Ntest, len(recons), len(split), len(deps)))
     error_l2   = np.zeros((Ntest, len(recons), len(split), len(deps)))
@@ -100,7 +100,7 @@ def error_analysis_adv2d(simulation):
                     simulation = simulation_adv_par_2d(int(N[i]), int(M[i]), dt[i], Tf, ic, vf, tc, recon, dp, opsplit)
 
                     # Run advection routine and get the errors
-                    error_linf[i,rec,sp,d], error_l1[i,rec,sp,d], error_l2[i,rec,sp,d] =  adv_2d(simulation, False)
+                    error_linf[i,rec,sp,d], error_l1[i,rec,sp,d], error_l2[i,rec,sp,d] =  adv_2d(simulation, False, False)
                     print('\nParameters: N = '+str(int(N[i]))+', dt = '+str(dt[i]),', recon = ', recon,', split = ',opsplit, ', dp = ', dp)
 
                     # Output
@@ -122,7 +122,7 @@ def error_analysis_adv2d(simulation):
             for sp in range(0, len(split)):
                 for r in range(0, len(recons)):
                     errors.append(error[:,r,sp,d])
-                    dep_name.append(dp_names[deps[d]-1]+'-'+sp_names[sp-1]+'-'+recon_names[recons[r]-1])
+                    dep_name.append(dp_names[deps[d]-1]+'/'+sp_names[sp-1]+'/'+recon_names[recons[r]-1])
 
         title = simulation.title + ' - ' + simulation.icname+', velocity = '+ str(simulation.vf)+', norm = '+norm_title[e]
         filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)\
