@@ -1,5 +1,5 @@
-# py-operator-splitting
-Python implementation of operator splitting methods using PPM (piecewise parabolic method)
+# py-dimension-splitting
+Python implementation of dimension splitting methods using PPM (piecewise parabolic method)
 
 Solves the linear advection equation
 
@@ -10,6 +10,7 @@ Luan F. Santos
 Requires:
 
 - numpy
+- numexpr
 - matplotlib
 
 -------------------------------------------------------
