@@ -84,7 +84,7 @@ def ppm_reconstruction_x(Q, px, simulation):
 
         # Final slope - Formula 1.8 from Collela and Woodward 1984
         px.dQ[i0-2:iend+2,:] = np.minimum(abs(px.dQ0[i0-2:iend+2,:]), abs(px.dQ1[i0-2:iend+2,:]))
-        px.dQ[i0-2:iend+2] = np.minimum(px.dQ[i0-2:iend+2,:], abs(px.dQ2[i0-2:iend+2,:]))*np.sign(px.dQ0[i0-2:iend+2,:])
+        px.dQ[i0-2:iend+2,:] = np.minimum(px.dQ[i0-2:iend+2,:], abs(px.dQ2[i0-2:iend+2,:]))*np.sign(px.dQ0[i0-2:iend+2,:])
         #mask = ( (Q[i0-1:iend+3,:] - Q[i0-2:iend+2,:]) * (Q[i0-2:iend+2,:] - Q[i0-3:iend+1,:]) > 0.0 ) # Indexes where (Q_{j+1}-Q_{j})*(Q_{j}-Q{j-1}) > 0
         Q1 = Q[i0-1:iend+3,:]
         Q2 = Q[i0-2:iend+2,:]

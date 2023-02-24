@@ -16,41 +16,14 @@ import numpy as np
 from plot                import plot_2dfield_graphs
 from diagnostics         import diagnostics_adv_2d
 from output              import print_diagnostics_adv_2d, output_adv
-from parameters_2d       import graphdir, ppm_parabola
-from advection_ic        import q0_adv_2d, qexact_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
-from cfl                 import cfl_x, cfl_y
+from parameters_2d       import graphdir
 from errors import *
 from advection_timestep  import adv_timestep
+from advection_vars      import adv_vars
 
 def adv_2d(simulation, plot, divtest_flag):
-    N  = simulation.N    # Number of cells in x direction
-    M  = simulation.M    # Number of cells in y direction
-    ic = simulation.ic   # Initial condition
-
-    x  = simulation.x    # Grid
-    xc = simulation.xc
-    x0 = simulation.x0
-    xf = simulation.xf
-    dx = simulation.dx   # Grid spacing
-
-    y  = simulation.y    # Grid
-    yc = simulation.yc
-    y0 = simulation.y0
-    yf = simulation.yf
-    dy = simulation.dy   # Grid spacing
-
     dt = simulation.dt   # Time step
     Tf = simulation.Tf   # Total period definition
-
-    tc = simulation.tc
-    icname = simulation.icname
-    recon = simulation.recon
-    dp = simulation.dp
-
-    # Ghost cells
-    ngl = simulation.ngl
-    ngr = simulation.ngr
-    ng  = simulation.ng
 
     # Grid interior indexes
     i0 = simulation.i0
@@ -58,59 +31,19 @@ def adv_2d(simulation, plot, divtest_flag):
     j0 = simulation.j0
     jend = simulation.jend
 
-    # Velocity at edges
-    u_edges = np.zeros((N+ng+1, M+ng))
-    v_edges = np.zeros((N+ng, M+ng+1))
-
     # Number of time steps
     Nsteps = int(Tf/dt)
+
     # Plotting var
     plotstep = int(Nsteps/5)
+
+    # Get vars
+    Q, div, u_edges, v_edges, px, py, cx, cy,\
+    Xc, Yc, Xu, Yu, Xv, Yv, CFL = adv_vars(simulation)
 
     if (divtest_flag):
         Nsteps = 1
         plotstep = 1
-
-    # Grid
-    Xc, Yc = np.meshgrid(xc, yc, indexing='ij')
-    X , Y  = np.meshgrid(x , y , indexing='ij')
-
-    # edges
-    Xu, Yu = np.meshgrid(x, yc,indexing='ij')
-    Xv, Yv = np.meshgrid(xc, y,indexing='ij')
-
-    # Initial velocity
-    u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
-    v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
-
-    # CFL at edges - x direction
-    cx = cfl_x(u_edges[:,:], simulation)
-
-    # CFL at edges - y direction
-    cy = cfl_y(v_edges[:,:], simulation)
-
-    # CFL number
-    CFL_x = np.amax(abs(cx))
-    CFL_y = np.amax(abs(cy))
-    CFL = max(CFL_x, CFL_y)
-
-    # Compute average values of Q (initial condition)
-    Q = np.zeros((N+ng, M+ng))
-    div = np.zeros((N+ng, M+ng))
-    Q[i0:iend,j0:jend] = q0_adv_2d(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation)
-
-    # Periodic boundary conditions
-    # x direction
-    Q[iend:N+ng,:] = Q[i0:i0+ngr,:]
-    Q[0:i0,:]      = Q[N:N+ngl,:]
-
-    # y direction
-    Q[:,jend:N+ng] = Q[:,j0:j0+ngr]
-    Q[:,0:j0]      = Q[:,M:M+ngl]
-
-    # PPM parabolas
-    px = ppm_parabola(simulation,'x')
-    py = ppm_parabola(simulation,'y')
 
     # Compute initial mass
     total_mass0, _ = diagnostics_adv_2d(Q, simulation, 1.0)
@@ -139,8 +72,7 @@ def adv_2d(simulation, plot, divtest_flag):
     if plot:
         CFL  = str("{:.2e}".format(CFL))
         # Plot the error evolution graph
-        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name+',dp = '+simulation.dp_name
-        filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name+\
-        '_dp'+simulation.dp_name+'_split'+simulation.opsplit_name+'_errors.png'
+        title = simulation.title +'- '+simulation.icname+', CFL='+str(CFL)+',\n N='+str(simulation.N)+', '+simulation.opsplit_name+', '+simulation.recon_name+', '+simulation.dp_name
+        filename = graphdir+'2d_adv_tc'+str(simulation.tc)+'_ic'+str(simulation.ic)+'_N'+str(simulation.N)+'_'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name+'_errors.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
     return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]

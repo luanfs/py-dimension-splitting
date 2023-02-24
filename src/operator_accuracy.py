@@ -40,13 +40,13 @@ def error_analysis_div(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 8
+    Ntest = 7
 
     # Number of cells
     N = np.zeros(Ntest)
-    N[0] = 10
+    N[0] = 16
     M = np.zeros(Ntest)
-    M[0] = 10
+    M[0] = 16
 
     # Timesteps
     dt = np.zeros(Ntest)
@@ -62,7 +62,7 @@ def error_analysis_div(simulation):
         dt[0] = 0.05
     elif simulation.vf == 3: # variable velocity
         Tf = 5.0
-        dt[0] = 0.10
+        dt[0] = 0.05
     else:
         exit()
 

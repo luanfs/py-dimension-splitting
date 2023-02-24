@@ -26,9 +26,6 @@ def print_diagnostics_adv_2d(error_linf, error_l1, error_l2, mass_change, t, Nst
 ####################################################################################
 def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL, divtest_flag):
     N  = simulation.N    # Number of cells in x direction
-    M  = simulation.M    # Number of cells in y direction
-    dx = simulation.dx
-    dt = simulation.dt
 
     # Grid interior indexes
     i0 = simulation.i0
@@ -53,7 +50,7 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
         # Diagnostic computation
         total_mass, mass_change = diagnostics_adv_2d(Q, simulation, total_mass0)
 
-        if plot and k>0:
+        if plot and k>0 and (not divtest_flag):
             # Print diagnostics on the screen
             print_diagnostics_adv_2d(error_linf[k], error_l1[k], error_l2[k], mass_change, k, Nsteps)
 
@@ -101,9 +98,9 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
             Uplot[0:nplot,0:nplot], Vplot[0:nplot,0:nplot]  = velocity_adv_2d(xplot, yplot, t, simulation)
 
             # Plot scalar field
-            if divtest_flag==False:
+            if (not divtest_flag):
                 filename = graphdir+'2d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+\
-                '_split'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name
+                '_'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name
                 title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+'\nN='+str(N)+', '+\
                 simulation.opsplit_name+', ' +simulation.recon_name+', '+simulation.dp_name+\
                 ' , Min = '+ qmin +', Max = '+qmax
@@ -123,7 +120,7 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
             # Plot  error div field
             else:
                 filename = graphdir+'2d_adv_error_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k)+'_N'+str(N)+\
-                '_split'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name
+                '_'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name
                 title = 'Divergence error, velocity = '+str(vf)+', CFL='+str(CFL)+', N='+str(N)+'\n '\
                 +simulation.opsplit_name+', '+simulation.recon_name+', '+simulation.dp_name
                 error = div[i0:iend,j0:jend]
