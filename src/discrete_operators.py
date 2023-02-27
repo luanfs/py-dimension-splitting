@@ -66,19 +66,6 @@ def divergence(Q, div, px, py, cx, cy, simulation):
     div[:,:] = ne.evaluate("-(pxdF + pydF)")
 
 ####################################################################################
-# Operator splitting implementation
-# Luan da Fonseca Santos - June 2022
-#
-# References:
-# Lin, S., & Rood, R. B. (1996). Multidimensional Flux-Form Semi-Lagrangian
-# Transport Schemes, Monthly Weather Review, 124(9), 2046-2070, from
-# https://journals.ametsoc.org/view/journals/mwre/124/9/1520-0493_1996_124_2046_mffslt_2_0_co_2.xml
-#
-###################################################################################
-
-#from flux import compute_flux_x, compute_flux_y
-
-####################################################################################
 # Flux operator in x direction
 # Inputs: Q (average values),
 # u_edges (velocity in x direction at edges)

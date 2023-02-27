@@ -20,6 +20,7 @@ from parameters_2d       import graphdir
 from errors import *
 from advection_timestep  import adv_timestep
 from advection_vars      import adv_vars
+from advection_ic        import velocity_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
 
 def adv_2d(simulation, plot, divtest_flag):
     dt = simulation.dt   # Time step
@@ -38,7 +39,7 @@ def adv_2d(simulation, plot, divtest_flag):
     plotstep = int(Nsteps/5)
 
     # Get vars
-    Q, div, u_edges, v_edges, px, py, cx, cy,\
+    Q, div, U_pu, U_pv, px, py, cx, cy,\
     Xc, Yc, Xu, Yu, Xv, Yv, CFL = adv_vars(simulation)
 
     if (divtest_flag):
@@ -63,10 +64,16 @@ def adv_2d(simulation, plot, divtest_flag):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, div, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
+        adv_timestep(Q, div, U_pu, U_pv, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
 
         # Output and plot
         output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, div, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL, divtest_flag)
+
+        # Updates for next time step
+        if simulation.vf >= 2:
+            # Velocity update
+            U_pu.u[:,:] = u_velocity_adv_2d(Xu, Yu, t, simulation)
+            U_pv.v[:,:] = v_velocity_adv_2d(Xv, Yv, t, simulation)
     #---------------------------------------End of time loop---------------------------------------
 
     if plot:

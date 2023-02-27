@@ -10,7 +10,7 @@ from discrete_operators  import divergence
 from averaged_velocity   import time_averaged_velocity
 import numexpr as ne
 
-def adv_timestep(Q, div, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation):
+def adv_timestep(Q, div, U_pu, U_pv, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation):
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
 
@@ -26,11 +26,11 @@ def adv_timestep(Q, div, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k,
     jend = simulation.jend
 
     # Compute the velocity need for the departure point (only for variable velocity)
-    time_averaged_velocity(u_edges, v_edges, Xu, Yu, Xv, Yv, k, t, simulation)
+    time_averaged_velocity(U_pu, U_pv, Xu, Yu, Xv, Yv, k, t, simulation)
 
     # CFL calculation
-    cx[:,:] = cfl_x(u_edges[:,:], simulation)
-    cy[:,:] = cfl_y(v_edges[:,:], simulation)
+    cx[:,:] = cfl_x(U_pu.u_averaged[:,:], simulation)
+    cy[:,:] = cfl_y(U_pv.v_averaged[:,:], simulation)
 
     # Compute the divergence
     divergence(Q, div, px, py, cx, cy, simulation)
@@ -50,8 +50,3 @@ def adv_timestep(Q, div, u_edges, v_edges, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k,
     Q[:,jend:N+ng] = Q[:,j0:j0+ngr]
     Q[:,0:j0]      = Q[:,M:M+ngl]
 
-    # Updates for next time step
-    if simulation.vf >= 2:
-        # Velocity update
-        u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, t, simulation)
-        v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, t, simulation)

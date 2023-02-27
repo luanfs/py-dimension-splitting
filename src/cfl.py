@@ -1,6 +1,6 @@
 ####################################################################################
 #
-# Module for computing the CFL number
+# Module for CFL number computation
 ####################################################################################
 import numpy as np
 import numexpr as ne

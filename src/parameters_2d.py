@@ -236,3 +236,35 @@ class ppm_parabola:
             self.dQ_min  = np.zeros((N+ng, M+ng))
             self.dQ_max  = np.zeros((N+ng, M+ng))
             self.dQ_mono = np.zeros((N+ng, M+ng))
+
+####################################################################################
+#  Velocity class
+#  The quadrilateral points are labeled as below
+#
+#  po-------pv--------po
+#  |                  |
+#  |                  |
+#  |                  |
+#  pu       pc        pu
+#  |                  |
+#  |                  |
+#  |                  |
+#  po--------pv-------po
+#
+####################################################################################
+class velocity_edges:
+    def __init__(self, simulation, pos):
+        N = simulation.N
+        M = simulation.M
+        ng = simulation.ng
+
+        if pos == 'pu':
+            self.u = np.zeros((N+1+ng, M+ng))
+            self.v = np.zeros((N+1+ng, M+ng))
+            self.u_averaged = np.zeros((N+1+ng, M+ng)) # used for departure point
+        elif pos == 'pv':
+            self.u = np.zeros((N+ng, M+1+ng))
+            self.v = np.zeros((N+ng, M+1+ng))
+            self.v_averaged = np.zeros((N+ng, M+1+ng)) # used for departure point
+        else:
+            print('ERROR in  velocity class: invalid position, ', pos)

@@ -4,7 +4,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters_2d       import ppm_parabola
+from parameters_2d       import ppm_parabola, velocity_edges
 from advection_ic        import q0_adv_2d, qexact_adv_2d, u_velocity_adv_2d, v_velocity_adv_2d
 from cfl                 import cfl_x, cfl_y
 
@@ -46,8 +46,8 @@ def adv_vars(simulation):
     jend = simulation.jend
 
     # Velocity at edges
-    u_edges = np.zeros((N+ng+1, M+ng))
-    v_edges = np.zeros((N+ng, M+ng+1))
+    U_pu = velocity_edges(simulation, 'pu')
+    U_pv = velocity_edges(simulation, 'pv')
 
     # Grid
     Xc, Yc = np.meshgrid(xc, yc, indexing='ij')
@@ -58,14 +58,14 @@ def adv_vars(simulation):
     Xv, Yv = np.meshgrid(xc, y,indexing='ij')
 
     # Initial velocity
-    u_edges[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
-    v_edges[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
+    U_pu.u[:,:] = u_velocity_adv_2d(Xu, Yu, 0.0, simulation)
+    U_pv.v[:,:] = v_velocity_adv_2d(Xv, Yv, 0.0, simulation)
 
     # CFL at edges - x direction
-    cx = cfl_x(u_edges[:,:], simulation)
+    cx = cfl_x(U_pu.u[:,:], simulation)
 
     # CFL at edges - y direction
-    cy = cfl_y(v_edges[:,:], simulation)
+    cy = cfl_y(U_pv.v[:,:], simulation)
 
     # CFL number
     CFL_x = np.amax(abs(cx))
@@ -90,5 +90,5 @@ def adv_vars(simulation):
     px = ppm_parabola(simulation,'x')
     py = ppm_parabola(simulation,'y')
 
-    return Q, div, u_edges, v_edges, px, py, cx, cy, \
+    return Q, div, U_pu, U_pv, px, py, cx, cy, \
            Xc, Yc, Xu, Yu, Xv, Yv, CFL
