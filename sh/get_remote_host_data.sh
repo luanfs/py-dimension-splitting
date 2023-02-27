@@ -73,6 +73,5 @@ echo "Untar and clean"
 cd ..
 tar -xvf $output
 mv $data $remote_host2$data$version
-pwd
 rm -rf $output
 #-------------------------------------------------------------------------------------------------------
