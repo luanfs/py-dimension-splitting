@@ -96,7 +96,7 @@ def G_operator(G, flux_y, cy, simulation):
     #G[:,j0:jend] = -(cy[:,j0+1:jend+1]*flux_y[:,j0+1:jend+1] - cy[:,j0:jend]*flux_y[:,j0:jend])
     c1 = cy[:,j0+1:jend+1]
     c2 = cy[:,j0:jend]
-    f1 = flux_y[:,j0+1:jend+1]
-    f2 = flux_y[:,j0:jend]
-    G[:,j0:jend] = ne.evaluate("-(c1*f1-c2*f2)")
+    g1 = flux_y[:,j0+1:jend+1]
+    g2 = flux_y[:,j0:jend]
+    G[:,j0:jend] = ne.evaluate("-(c1*g1-c2*g2)")
 
