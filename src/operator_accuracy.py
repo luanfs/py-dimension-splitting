@@ -130,14 +130,14 @@ def error_analysis_div(simulation):
                     dep_name.append(sp_names[sp-1]+'/'+recon_names[recons[r]-1])
 
             title = 'Divergence error, vf='+ str(simulation.vf)+\
-            ', dp = '+dp_names[deps[d]-1]+', norm='+norm_title[e]
+            ', dp='+dp_names[deps[d]-1]+', norm='+norm_title[e]
             filename = graphdir+'2d_div_vf'+str(vf)+'_dp'+dp_names[deps[d]-1]\
             +'_norm'+norm_list[e]+'_parabola_errors.pdf'
             plot_errors_loglog(N, errors, dep_name, filename, title, emin, emax)
 
             # Plot the convergence rate
             title = 'Divergence convergence rate, vf=' + str(simulation.vf)+\
-            ', dp = '+dp_names[deps[d]-1]+', norm='+norm_title[e]
+            ', dp='+dp_names[deps[d]-1]+', norm='+norm_title[e]
             filename = graphdir+'2d_div__vf'+str(vf)+'_dp'+dp_names[deps[d]-1]\
             +'_norm'+norm_list[e]+'_convergence_rate.pdf'
             plot_convergence_rate(N, errors, dep_name, filename, title, CRmin, CRmax)
