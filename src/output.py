@@ -113,8 +113,9 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
                     title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+'\nN='+str(N)+', '+\
                     simulation.opsplit_name+', ' +simulation.recon_name+', '+simulation.dp_name
                     error = q_exact-Q[i0:iend,j0:jend]
-                    emin = np.amin(error)
-                    emax = np.amax(error)
+                    emax_abs = np.amax(abs(error))
+                    emin =-emax_abs
+                    emax = emax_abs
                     plot_2dfield_graphs([error], [emin], [emax], ['seismic'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
 
             # Plot  error div field
@@ -124,7 +125,8 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
                 title = 'Divergence error, velocity = '+str(vf)+', CFL='+str(CFL)+', N='+str(N)+'\n '\
                 +simulation.opsplit_name+', '+simulation.recon_name+', '+simulation.dp_name
                 error = div[i0:iend,j0:jend]
-                emin = np.amin(error)
-                emax = np.amax(error)
+                emax_abs = np.amax(abs(error))
+                emin =-emax_abs
+                emax = emax_abs
                 plot_2dfield_graphs([error], [emin], [emax], ['seismic'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
 

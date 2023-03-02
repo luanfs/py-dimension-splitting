@@ -40,7 +40,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 3
+    Ntest = 7
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -127,7 +127,7 @@ def error_analysis_adv2d(simulation):
             for sp in range(0, len(split)):
                 for r in range(0, len(recons)):
                     errors.append(error[:,r,sp,d])
-                    dep_name.append(sp_names[sp-1]+'/'+recon_names[recons[r]-1])
+                    dep_name.append(sp_names[split[sp]-1]+'/'+recon_names[recons[r]-1])
 
             title = simulation.title + ' - ' + simulation.icname+', vf='+ str(simulation.vf)+\
             ', dp='+dp_names[deps[d]-1]+', norm='+norm_title[e]

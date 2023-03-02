@@ -10,7 +10,10 @@ import numexpr as ne
 
 def time_averaged_velocity(U_pu, U_pv,  Xu, Yu, Xv, Yv, k, t, simulation):
     # Compute the velocity needed for the departure point
-    if simulation.vf >= 2:
+    if simulation.vf == 1: # constant velocity
+        U_pu.u_averaged[:,:] = U_pu.u[:,:]
+        U_pv.v_averaged[:,:] = U_pv.v[:,:]
+    elif simulation.vf >= 2:
         if simulation.dp == 1:
             U_pu.u_averaged[:,:] = U_pu.u[:,:]
             U_pv.v_averaged[:,:] = U_pv.v[:,:]
