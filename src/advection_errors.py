@@ -74,7 +74,7 @@ def error_analysis_adv2d(simulation):
     #deps = (simulation.dp,)
     #split = (simulation.opsplit,)
 
-    recon_names = ['PPM', 'PPM-CW84','PPM-PL07','PPM-L04']
+    recon_names = ['PPM-0', 'PPM-CW84','PPM-PL07','PPM-L04']
     dp_names = ['RK1', 'RK3']
     sp_names = ['SP-AVLT', 'SP-L04', 'SP-PL07']
     error_linf = np.zeros((Ntest, len(recons), len(split), len(deps)))
