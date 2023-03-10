@@ -63,7 +63,8 @@ def divergence(Q, div, px, py, cx, cy, simulation):
     # Compute the divergence
     pxdF = px.dF
     pydF = py.dF
-    div[:,:] = ne.evaluate("-(pxdF + pydF)")
+    dt = simulation.dt
+    div[:,:] = ne.evaluate("-(pxdF + pydF)/dt")
 
 ####################################################################################
 # Flux operator in x direction

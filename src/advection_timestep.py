@@ -38,7 +38,7 @@ def adv_timestep(Q, div, U_pu, U_pv, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simul
     # Update
     #Q[i0:iend,j0:jend] = Q[i0:iend,j0:jend] - div[i0:iend,j0:jend]
     Q0 = Q[i0:iend,j0:jend]
-    d0 = -div[i0:iend,j0:jend]
+    d0 = -simulation.dt*div[i0:iend,j0:jend]
     Q[i0:iend,j0:jend] = ne.evaluate('Q0+d0')
 
     # Periodic boundary conditions
