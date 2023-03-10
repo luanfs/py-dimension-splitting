@@ -21,18 +21,16 @@ from cfl import cfl_x, cfl_y
 import numexpr as ne
 
 ####################################################################################
-# Compute the 1d flux operator
-# Inputs: Q (average values),  u_edges (velocity at edges)
-# ax (stencil coefficients), cx, cx2 (CFL, CFL^2 in x direction)
-# Output: flux_x (flux in x direction)
+# Compute the fluxes needed for dimension spliting operators
 ####################################################################################
-def compute_flux_x(Q, px, cx, simulation):
-    N = simulation.N
+def compute_fluxes(Qx, Qy, px, py, cx, cy, simulation):
     # Reconstructs the values of Q using a piecewise parabolic polynomial
-    rec.ppm_reconstruction_x(Q, px, simulation)
+    rec.ppm_reconstruction_x(Qx, px, simulation)
+    rec.ppm_reconstruction_y(Qy, py, simulation)
 
     # Compute the fluxes
     numerical_flux_ppm_x(px, cx, simulation)
+    numerical_flux_ppm_y(py, cy, simulation)
 
 ####################################################################################
 # PPM flux in x direction
@@ -67,20 +65,6 @@ def numerical_flux_ppm_x(px, cx, simulation):
     px.f_upw[~mask] = px.f_R[~mask]
 
 ####################################################################################
-# Compute the 1d flux operator in y direction
-# Inputs: Q (average values),  v_edges (velocity at edges)
-# ay (stencil coefficients), cy, cy2 (CFL, CFL^2 in y direction)
-# Output: flux_y (flux in y direction)
-####################################################################################
-def compute_flux_y(Q, py, cy, simulation):
-    M = simulation.M
-    # Reconstructs the values of Q using a piecewise parabolic polynomial
-    rec.ppm_reconstruction_y(Q, py, simulation)
-
-    # Compute the fluxes
-    numerical_flux_ppm_y(py, cy, simulation)
-
-####################################################################################
 # PPM flux in y direction
 ####################################################################################
 def numerical_flux_ppm_y(py, cy, simulation):
@@ -111,12 +95,5 @@ def numerical_flux_ppm_y(py, cy, simulation):
     mask = ne.evaluate('cy >= 0')
     py.f_upw[mask]  = py.f_L[mask]
     py.f_upw[~mask] = py.f_R[~mask]
-
-####################################################################################
-# Compute the fluxes needed for dimension spliting operators
-####################################################################################
-def compute_fluxes(Qx, Qy, px, py, cx, cy, simulation):
-    compute_flux_x(Qx, px, cx, simulation)
-    compute_flux_y(Qy, py, cy, simulation)
 
 
