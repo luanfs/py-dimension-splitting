@@ -156,7 +156,7 @@ class simulation_adv_par_2d:
         self.x, self.xc, self.dx, self.y, self.yc, self.dy = grid_2d(x0, xf, N, y0, yf, M, self.ngl, self.ngr, self.ng)
 
         # RK vars
-        if dp == 2:
+        if dp == 3:
             self.K1u = np.zeros((N+self.ng+1,M+self.ng))
             self.K2u = np.zeros((N+self.ng+1,M+self.ng))
             self.K3u = np.zeros((N+self.ng+1,M+self.ng))
@@ -262,9 +262,12 @@ class velocity_edges:
             self.u = np.zeros((N+1+ng, M+ng))
             self.v = np.zeros((N+1+ng, M+ng))
             self.u_averaged = np.zeros((N+1+ng, M+ng)) # used for departure point
+            self.u_old      = np.zeros((N+1+ng, M+ng)) # used for departure point
         elif pos == 'pv':
             self.u = np.zeros((N+ng, M+1+ng))
             self.v = np.zeros((N+ng, M+1+ng))
             self.v_averaged = np.zeros((N+ng, M+1+ng)) # used for departure point
+            self.v_old      = np.zeros((N+ng, M+1+ng)) # used for departure point
+
         else:
             print('ERROR in  velocity class: invalid position, ', pos)

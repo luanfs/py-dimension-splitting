@@ -50,3 +50,11 @@ def adv_timestep(Q, div, U_pu, U_pv, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simul
     Q[:,jend:N+ng] = Q[:,j0:j0+ngr]
     Q[:,0:j0]      = Q[:,M:M+ngl]
 
+    # Updates for next time step
+    if simulation.vf >= 2:
+        # Velocity update
+        U_pu.u_old[:,:] = U_pu.u[:,:]
+        U_pv.v_old[:,:] = U_pv.v[:,:]
+        U_pu.u[:,:] = u_velocity_adv_2d(Xu, Yu, t, simulation)
+        U_pv.v[:,:] = v_velocity_adv_2d(Xv, Yv, t, simulation)
+

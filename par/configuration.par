@@ -4,7 +4,7 @@
 #Number of cells M (y direction)
 100
 #Problem to be solved (1, 2, 3)
-3
+1
 #-----------Description of parameters -------------------------------------
 #  case(1) - Linear advection equation (see advection.par)
 #  case(2) - Non linear shallow water equations (see sw.par)

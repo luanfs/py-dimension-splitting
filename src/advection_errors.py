@@ -31,8 +31,6 @@ def error_analysis_adv2d(simulation):
     # Test case
     tc = simulation.tc
 
-    # CFL number for all simulations
-
     # Interval
     x0 = simulation.x0
     xf = simulation.xf
@@ -40,7 +38,7 @@ def error_analysis_adv2d(simulation):
     yf = simulation.yf
 
     # Number of tests
-    Ntest = 5
+    Ntest = 4
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -67,15 +65,15 @@ def error_analysis_adv2d(simulation):
         exit()
 
     # Errors array
-    #recons = (1,2,3,4)
-    #deps = (1,2)
-    #split = (1,2,3)
-    recons = (simulation.recon,)
-    deps = (simulation.dp,)
-    split = (simulation.opsplit,)
+    recons = (3,4)
+    deps = (1,2)
+    split = (1,)
+    #recons = (simulation.recon,)
+    #deps = (simulation.dp,)
+    #split = (simulation.opsplit,)
 
     recon_names = ['PPM-0', 'PPM-CW84','PPM-PL07','PPM-L04']
-    dp_names = ['RK1', 'RK3']
+    dp_names = ['RK1', 'RK2', 'RK3']
     sp_names = ['SP-AVLT', 'SP-L04', 'SP-PL07']
     error_linf = np.zeros((Ntest, len(recons), len(split), len(deps)))
     error_l1   = np.zeros((Ntest, len(recons), len(split), len(deps)))

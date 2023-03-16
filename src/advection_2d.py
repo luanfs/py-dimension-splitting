@@ -69,12 +69,7 @@ def adv_2d(simulation, plot, divtest_flag):
         # Output and plot
         output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, div, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL, divtest_flag)
 
-        # Updates for next time step
-        if simulation.vf >= 2:
-            # Velocity update
-            U_pu.u[:,:] = u_velocity_adv_2d(Xu, Yu, t, simulation)
-            U_pv.v[:,:] = v_velocity_adv_2d(Xv, Yv, t, simulation)
-    #---------------------------------------End of time loop---------------------------------------
+   #---------------------------------------End of time loop---------------------------------------
 
     if plot:
         CFL  = str("{:.2e}".format(CFL))
