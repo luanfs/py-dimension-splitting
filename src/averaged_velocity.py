@@ -15,6 +15,8 @@ def time_averaged_velocity(U_pu, U_pv,  Xu, Yu, Xv, Yv, k, t, simulation):
     iend = simulation.iend
     j0   = simulation.j0
     jend = simulation.jend
+    N = simulation.N
+    ng = simulation.ng
 
     # Compute the velocity needed for the departure point
     if simulation.vf == 1: # constant velocity
@@ -38,7 +40,7 @@ def time_averaged_velocity(U_pu, U_pv,  Xu, Yu, Xv, Yv, k, t, simulation):
             u_interp = 1.5*U_pu.u[:,:] - 0.5*U_pu.u_old[:,:] # extrapolation for time at n+1/2
 
             # Linear interpolation
-            for j in range(j0, jend):
+            for j in range(0, N+ng):
                 U_pu.u_averaged[i0:iend+1,j] = np.interp(xd[i0:iend+1,j], Xu[i0-1:iend+2,j], u_interp[i0-1:iend+2,j])
 
             #----------------------------------------------------
@@ -49,7 +51,7 @@ def time_averaged_velocity(U_pu, U_pv,  Xu, Yu, Xv, Yv, k, t, simulation):
             v_interp = 1.5*U_pv.v[:,:] - 0.5*U_pv.v_old[:,:] # extrapolation for time at n+1/2
 
             # Linear interpolation
-            for i in range(i0, iend):
+            for i in range(0, N+ng):
                 U_pv.v_averaged[i,j0:jend+1] = np.interp(yd[i,j0:jend+1], Yv[i,j0-1:jend+2], v_interp[i,j0-1:jend+2])
 
         elif simulation.dp == 3:
