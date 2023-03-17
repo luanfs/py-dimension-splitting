@@ -40,8 +40,13 @@ def time_averaged_velocity(U_pu, U_pv,  Xu, Yu, Xv, Yv, k, t, simulation):
             u_interp = 1.5*U_pu.u[:,:] - 0.5*U_pu.u_old[:,:] # extrapolation for time at n+1/2
 
             # Linear interpolation
-            for j in range(0, N+ng):
-                U_pu.u_averaged[i0:iend+1,j] = np.interp(xd[i0:iend+1,j], Xu[i0-1:iend+2,j], u_interp[i0-1:iend+2,j])
+            #for j in range(0, N+ng):
+            #    U_pu.u_averaged[i0:iend+1,j] = np.interp(xd[i0:iend+1,j], Xu[i0-1:iend+2,j], u_interp[i0-1:iend+2,j])
+            a = (Xu[i0:iend+1,:]-xd[i0:iend+1,:])/simulation.dx
+            upos = U_pu.u[i0:iend+1,:]>=0
+            uneg = ~upos
+            U_pu.u_averaged[i0:iend+1,:][upos] = (1.0-a[upos])*u_interp[i0:iend+1,:][upos] + a[upos]*u_interp[i0-1:iend,:][upos]
+            U_pu.u_averaged[i0:iend+1,:][uneg] = -a[uneg]*u_interp[i0+1:iend+2,:][uneg] + (1.0+a[uneg])*u_interp[i0:iend+1,:][uneg]
 
             #----------------------------------------------------
             # First departure point estimate
@@ -51,8 +56,14 @@ def time_averaged_velocity(U_pu, U_pv,  Xu, Yu, Xv, Yv, k, t, simulation):
             v_interp = 1.5*U_pv.v[:,:] - 0.5*U_pv.v_old[:,:] # extrapolation for time at n+1/2
 
             # Linear interpolation
-            for i in range(0, N+ng):
-                U_pv.v_averaged[i,j0:jend+1] = np.interp(yd[i,j0:jend+1], Yv[i,j0-1:jend+2], v_interp[i,j0-1:jend+2])
+            #for i in range(0, N+ng):
+            #    U_pv.v_averaged[i,j0:jend+1] = np.interp(yd[i,j0:jend+1], Yv[i,j0-1:jend+2], v_interp[i,j0-1:jend+2])
+            a = (Yv[:,j0:jend+1]-yd[:,j0:jend+1])/simulation.dy
+            vpos = U_pv.v[:,j0:jend+1]>=0
+            vneg = ~vpos
+            U_pv.v_averaged[:,j0:jend+1][vpos] = (1.0-a[vpos])*v_interp[:,j0:jend+1][vpos] + a[vpos]*v_interp[:,j0-1:jend][vpos]
+            U_pv.v_averaged[:,j0:jend+1][vneg] = -a[vneg]*v_interp[:,j0+1:jend+2][vneg] + (1.0+a[vneg])*v_interp[:,j0:jend+1][vneg]
+
 
         elif simulation.dp == 3:
             dt = simulation.dt
