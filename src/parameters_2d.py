@@ -110,7 +110,7 @@ class simulation_adv_par_2d:
         if dp == 1:
             dp_name = 'RK1'
         elif dp == 2:
-            dp_name = 'RK3'
+            dp_name = 'RK2'
         else:
            print("Error in simulation_adv_par_1d - invalid departure point scheme", dp)
            exit()
