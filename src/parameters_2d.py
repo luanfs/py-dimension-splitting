@@ -182,6 +182,38 @@ class simulation_adv_par_2d:
             print("Error - invalid test case")
             exit()
 
+        # Variable of the advection model
+        ng = self.ng
+        self.Q = np.zeros((N+ng, N+ng))
+
+        # PPM parabola
+        self.px = None
+        self.py = None
+
+        # Numerical divergence
+        self.div = np.zeros((N+ng, N+ng))
+
+        # Velocity at edges
+        self.U_pu = None
+        self.U_pv = None
+
+        # CFL
+        self.cx = np.zeros((N+ng+1, N+ng))
+        self.cy = np.zeros((N+ng, N+ng+1))
+        self.CFL = 0.0
+
+        # Mass
+        self.total_mass0 = 0.0
+        self.total_mass  = 0.0
+        self.mass_change = 0.0
+
+        # Grid
+        self.Xu, self.Yu = None, None
+        self.Xv, self.Xv = None, None
+        self.Xc, self.Xc = None, None
+
+        # Errors
+        self.error_linf, self.error_l1, self.error_l2 = None, None, None
 
 ####################################################################################
 #  Parabola class
@@ -252,7 +284,7 @@ class ppm_parabola:
 #  po--------pv-------po
 #
 ####################################################################################
-class velocity_edges:
+class velocity:
     def __init__(self, simulation, pos):
         N = simulation.N
         M = simulation.M

@@ -67,7 +67,7 @@ def error_analysis_adv2d(simulation):
     # Errors array
     recons = (3,4)
     deps = (1,2)
-    split = (1,)
+    split = (1,2,3)
     #recons = (simulation.recon,)
     #deps = (simulation.dp,)
     #split = (simulation.opsplit,)

@@ -24,7 +24,7 @@ def print_diagnostics_adv_2d(error_linf, error_l1, error_l2, mass_change, t, Nst
 ####################################################################################
 # Output and plot
 ####################################################################################
-def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL, divtest_flag):
+def output_adv(simulation, plot, k, t, Nsteps, plotstep, divtest_flag):
     N  = simulation.N    # Number of cells in x direction
 
     # Grid interior indexes
@@ -35,24 +35,24 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
 
     if plot or k==Nsteps:
         # Compute exact solution
-        q_exact = qexact_adv_2d(Xc, Yc, t, simulation)
+        q_exact = qexact_adv_2d(simulation.Xc[i0:iend,j0:jend], simulation.Yc[i0:iend,j0:jend], t, simulation)
 
         # Diagnostic computation
-        total_mass, mass_change = diagnostics_adv_2d(Q, simulation, total_mass0)
+        simulation.total_mass, simulation.mass_change = diagnostics_adv_2d(simulation.Q, simulation, simulation.total_mass0)
 
         # Relative errors in different metrics
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q[i0:iend,j0:jend], q_exact)
+        simulation.error_linf[k], simulation.error_l1[k], simulation.error_l2[k] = compute_errors(simulation.Q[i0:iend,j0:jend], q_exact)
 
-        if error_linf[k] > 10**(2):
+        if simulation.error_linf[k] > 10**(2):
             print('\nStopping due to large errors.')
             exit()
 
         # Diagnostic computation
-        total_mass, mass_change = diagnostics_adv_2d(Q, simulation, total_mass0)
+        simulation.total_mass, simulation.mass_change = diagnostics_adv_2d(simulation.Q, simulation, simulation.total_mass0)
 
         if plot and k>0 and (not divtest_flag):
             # Print diagnostics on the screen
-            print_diagnostics_adv_2d(error_linf[k], error_l1[k], error_l2[k], mass_change, k, Nsteps)
+            print_diagnostics_adv_2d(simulation.error_linf[k], simulation.error_l1[k], simulation.error_l2[k], simulation.mass_change, k, Nsteps)
 
         if k%plotstep==0 or k==0 or k==Nsteps :
             # Plot the graph and print diagnostic
@@ -74,12 +74,12 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
             Uplot = np.zeros((nplot, nplot))
             Vplot = np.zeros((nplot, nplot))
 
-            qmin = np.amin(Q)
-            qmax = np.amax(Q)
+            qmin = np.amin(simulation.Q)
+            qmax = np.amax(simulation.Q)
             qmin = str("{:.2e}".format(qmin))
             qmax = str("{:.2e}".format(qmax))
             time = str("{:.2e}".format(t))
-            CFL  = str("{:.2e}".format(CFL))
+            CFL  = str("{:.2e}".format(simulation.CFL))
 
             # colorbar range
             if simulation.ic == 1:
@@ -104,7 +104,8 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
                 title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+'\nN='+str(N)+', '+\
                 simulation.opsplit_name+', ' +simulation.recon_name+', '+simulation.dp_name+\
                 ' , Min = '+ qmin +', Max = '+qmax
-                plot_2dfield_graphs([Q[i0:iend,j0:jend]], [Qmin], [Qmax], ['jet'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+                plot_2dfield_graphs([simulation.Q[i0:iend,j0:jend]], [Qmin], [Qmax], ['jet'],\
+                simulation.Xc[i0:iend,j0:jend], simulation.Yc[i0:iend,j0:jend], [Uplot], [Vplot], xplot, yplot, filename, title)
 
                 # plot final error
                 if k == Nsteps:
@@ -112,11 +113,12 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
                     '_split'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name
                     title = icname+', velocity = '+str(vf)+' - time='+time+', CFL='+str(CFL)+'\nN='+str(N)+', '+\
                     simulation.opsplit_name+', ' +simulation.recon_name+', '+simulation.dp_name
-                    error = q_exact-Q[i0:iend,j0:jend]
+                    error = q_exact-simulation.Q[i0:iend,j0:jend]
                     emax_abs = np.amax(abs(error))
                     emin =-emax_abs
                     emax = emax_abs
-                    plot_2dfield_graphs([error], [emin], [emax], ['seismic'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+                    plot_2dfield_graphs([error], [emin], [emax], ['seismic'], simulation.Xc[i0:iend,j0:jend], simulation.Yc[i0:iend,j0:jend],\
+                    [Uplot], [Vplot], xplot, yplot, filename, title)
 
             # Plot  error div field
             else:
@@ -124,9 +126,10 @@ def output_adv(Xc, Yc, simulation, Q, div, error_linf, error_l1, error_l2, plot,
                 '_'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name
                 title = 'Divergence error, velocity = '+str(vf)+', CFL='+str(CFL)+', N='+str(N)+'\n '\
                 +simulation.opsplit_name+', '+simulation.recon_name+', '+simulation.dp_name
-                error = div[i0:iend,j0:jend]
+                error = simulation.div[i0:iend,j0:jend]
                 emax_abs = np.amax(abs(error))
                 emin =-emax_abs
                 emax = emax_abs
-                plot_2dfield_graphs([error], [emin], [emax], ['seismic'], Xc, Yc, [Uplot], [Vplot], xplot, yplot, filename, title)
+                plot_2dfield_graphs([error], [emin], [emax], ['seismic'], simulation.Xc[i0:iend,j0:jend], simulation.Yc[i0:iend,j0:jend],\
+                [Uplot], [Vplot], xplot, yplot, filename, title)
 

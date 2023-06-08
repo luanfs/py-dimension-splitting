@@ -39,24 +39,23 @@ def adv_2d(simulation, plot, divtest_flag):
     plotstep = int(Nsteps/5)
 
     # Get vars
-    Q, div, U_pu, U_pv, px, py, cx, cy,\
-    Xc, Yc, Xu, Yu, Xv, Yv, CFL = adv_vars(simulation)
+    adv_vars(simulation)
 
     if (divtest_flag):
         Nsteps = 1
         plotstep = 1
 
     # Compute initial mass
-    total_mass0, _ = diagnostics_adv_2d(Q, simulation, 1.0)
+    simulation.total_mass0, _ = diagnostics_adv_2d(simulation.Q, simulation, 1.0)
 
     # Error variables
-    error_linf = np.zeros(Nsteps+1)
-    error_l1   = np.zeros(Nsteps+1)
-    error_l2   = np.zeros(Nsteps+1)
+    simulation.error_linf = np.zeros(Nsteps+1)
+    simulation.error_l1   = np.zeros(Nsteps+1)
+    simulation.error_l2   = np.zeros(Nsteps+1)
 
     # Initial plotting
     if (not divtest_flag):
-        output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, div, error_linf, error_l1, error_l2, plot, 0, 0.0, Nsteps, plotstep, total_mass0, CFL, divtest_flag)
+        output_adv(simulation, plot, 0, 0.0, Nsteps, plotstep, divtest_flag)
 
     # Time looping
     for k in range(1, Nsteps+1):
@@ -64,17 +63,19 @@ def adv_2d(simulation, plot, divtest_flag):
         t = k*dt
 
         # Applies a time step
-        adv_timestep(Q, div, U_pu, U_pv, px, py, cx, cy, Xu, Yu, Xv, Yv, t, k, simulation)
+        adv_timestep(t, k, simulation)
 
         # Output and plot
-        output_adv(Xc[i0:iend,j0:jend], Yc[i0:iend,j0:jend], simulation, Q, div, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL, divtest_flag)
+        output_adv(simulation, plot, k, t, Nsteps, plotstep, divtest_flag)
 
    #---------------------------------------End of time loop---------------------------------------
 
     if plot:
-        CFL  = str("{:.2e}".format(CFL))
+        CFL  = str("{:.2e}".format(simulation.CFL))
         # Plot the error evolution graph
-        title = simulation.title +'- '+simulation.icname+', CFL='+str(CFL)+',\n N='+str(simulation.N)+', '+simulation.opsplit_name+', '+simulation.recon_name+', '+simulation.dp_name
-        filename = graphdir+'2d_adv_tc'+str(simulation.tc)+'_ic'+str(simulation.ic)+'_N'+str(simulation.N)+'_'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name+'_errors.png'
-        plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
-    return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]
+        title = simulation.title +'- '+simulation.icname+', CFL='+str(CFL)+',\n N='+str(simulation.N)+\
+        ', '+simulation.opsplit_name+', '+simulation.recon_name+', '+simulation.dp_name+'\n'
+        filename = graphdir+'2d_adv_tc'+str(simulation.tc)+'_ic'+str(simulation.ic)+'_N'+str(simulation.N)+\
+        '_'+simulation.opsplit_name+'_'+simulation.recon_name+'_'+simulation.dp_name+'_errors.png'
+        plot_time_evolution([simulation.error_linf, simulation.error_l1, simulation.error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
+    return simulation.error_linf[Nsteps], simulation.error_l1[Nsteps], simulation.error_l2[Nsteps]

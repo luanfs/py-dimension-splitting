@@ -13,21 +13,21 @@ import numexpr as ne
 # are the cfl numbers (must be already computed)
 # The divergence is given by px.dF + py.dF
 ####################################################################################
-def divergence(Q, div, px, py, cx, cy, simulation):
+def divergence(simulation):
     # Compute the fluxes
-    compute_fluxes(Q, Q, px, py, cx, cy, simulation)
+    compute_fluxes(simulation.Q, simulation.Q, simulation.px, simulation.py, simulation.cx, simulation.cy, simulation)
 
     # Applies F and G operators
-    F_operator(px.dF, px.f_upw, cx, simulation)
-    G_operator(py.dF, py.f_upw, cy, simulation)
+    F_operator(simulation.px.dF, simulation.px.f_upw, simulation.cx, simulation)
+    G_operator(simulation.py.dF, simulation.py.f_upw, simulation.cy, simulation)
 
     N = simulation.N
     ng = simulation.ng
-
+    Q = simulation.Q
     # Splitting scheme
     if simulation.opsplit==1:
-        pxdF = px.dF
-        pydF = py.dF
+        pxdF = simulation.px.dF
+        pydF = simulation.py.dF
         Qx = ne.evaluate("Q+0.5*pxdF")
         Qy = ne.evaluate("Q+0.5*pydF")
     elif simulation.opsplit==2:
@@ -36,35 +36,35 @@ def divergence(Q, div, px, py, cx, cy, simulation):
         #py.dF = py.dF + (cy[:,1:]-cy[:,:N+ng])*Q
         #Qx = Q+0.5*px.dF
         #Qy = Q+0.5*py.dF
-        pxdF = px.dF
-        pydF = py.dF
-        c1x, c2x = cx[1:,:], cx[:N+ng,:]
-        c1y, c2y = cy[:,1:], cy[:,:N+ng]
+        pxdF = simulation.px.dF
+        pydF = simulation.py.dF
+        c1x, c2x = simulation.cx[1:,:], simulation.cx[:N+ng,:]
+        c1y, c2y = simulation.cy[:,1:], simulation.cy[:,:N+ng]
         Qx = ne.evaluate('(Q + 0.5*(pxdF + (c1x-c2x)*Q))')
         Qy = ne.evaluate('(Q + 0.5*(pydF + (c1y-c2y)*Q))')
     elif simulation.opsplit==3:
         # PL07 - equation 17 and 18
         #Qx = 0.5*(Q + (Q + px.dF)/(1.0-(cx[1:,:]-cx[:N+ng,:])))
         #Qy = 0.5*(Q + (Q + py.dF)/(1.0-(cy[:,1:]-cy[:,:N+ng])))
-        pxdF = px.dF
-        pydF = py.dF
-        c1x, c2x = cx[1:,:], cx[:N+ng,:]
-        c1y, c2y = cy[:,1:], cy[:,:N+ng]
+        pxdF = simulation.px.dF
+        pydF = simulation.py.dF
+        c1x, c2x = simulation.cx[1:,:], simulation.cx[:N+ng,:]
+        c1y, c2y = simulation.cy[:,1:], simulation.cy[:,:N+ng]
         Qx = ne.evaluate('0.5*(Q + (Q + pxdF)/(1.0-(c1x-c2x)))')
         Qy = ne.evaluate('0.5*(Q + (Q + pydF)/(1.0-(c1y-c2y)))')
 
     # Compute the fluxes again
-    compute_fluxes(Qy, Qx, px, py, cx, cy, simulation)
+    compute_fluxes(Qy, Qx, simulation.px, simulation.py, simulation.cx, simulation.cy, simulation)
 
     # Applies F and G operators again
-    F_operator(px.dF, px.f_upw, cx, simulation)
-    G_operator(py.dF, py.f_upw, cy, simulation)
+    F_operator(simulation.px.dF, simulation.px.f_upw, simulation.cx, simulation)
+    G_operator(simulation.py.dF, simulation.py.f_upw, simulation.cy, simulation)
 
     # Compute the divergence
-    pxdF = px.dF
-    pydF = py.dF
+    pxdF = simulation.px.dF
+    pydF = simulation.py.dF
     dt = simulation.dt
-    div[:,:] = ne.evaluate("-(pxdF + pydF)/dt")
+    simulation.div[:,:] = ne.evaluate("-(pxdF + pydF)/dt")
 
 ####################################################################################
 # Flux operator in x direction
