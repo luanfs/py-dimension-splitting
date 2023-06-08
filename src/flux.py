@@ -23,19 +23,19 @@ import numexpr as ne
 ####################################################################################
 # Compute the fluxes needed for dimension spliting operators
 ####################################################################################
-def compute_fluxes(Qx, Qy, px, py, cx, cy, simulation):
+def compute_fluxes(Qx, Qy, px, py, U_pu, U_pv, cx, cy, simulation):
     # Reconstructs the values of Q using a piecewise parabolic polynomial
     rec.ppm_reconstruction_x(Qx, px, simulation)
     rec.ppm_reconstruction_y(Qy, py, simulation)
 
     # Compute the fluxes
-    numerical_flux_ppm_x(px, cx, simulation)
-    numerical_flux_ppm_y(py, cy, simulation)
+    numerical_flux_ppm_x(px, U_pu, cx, simulation)
+    numerical_flux_ppm_y(py, U_pv, cy, simulation)
 
 ####################################################################################
 # PPM flux in x direction
 ####################################################################################
-def numerical_flux_ppm_x(px, cx, simulation):
+def numerical_flux_ppm_x(px, U_pu, cx, simulation):
     N = simulation.N
     M = simulation.M
     ng = simulation.ng
@@ -63,11 +63,12 @@ def numerical_flux_ppm_x(px, cx, simulation):
     mask = ne.evaluate('cx >= 0')
     px.f_upw[mask]  = px.f_L[mask]
     px.f_upw[~mask] = px.f_R[~mask]
+    px.f_upw[:] = U_pu.u_averaged[:]*px.f_upw[:]
 
 ####################################################################################
 # PPM flux in y direction
 ####################################################################################
-def numerical_flux_ppm_y(py, cy, simulation):
+def numerical_flux_ppm_y(py, U_pv, cy, simulation):
     N = simulation.N
     M = simulation.M
     ng = simulation.ng
@@ -95,5 +96,4 @@ def numerical_flux_ppm_y(py, cy, simulation):
     mask = ne.evaluate('cy >= 0')
     py.f_upw[mask]  = py.f_L[mask]
     py.f_upw[~mask] = py.f_R[~mask]
-
-
+    py.f_upw[:] = U_pv.v_averaged[:]*py.f_upw[:]

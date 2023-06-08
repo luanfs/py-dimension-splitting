@@ -15,11 +15,12 @@ import numexpr as ne
 ####################################################################################
 def divergence(simulation):
     # Compute the fluxes
-    compute_fluxes(simulation.Q, simulation.Q, simulation.px, simulation.py, simulation.cx, simulation.cy, simulation)
+    compute_fluxes(simulation.Q, simulation.Q, simulation.px, simulation.py,\
+    simulation.U_pu, simulation.U_pv, simulation.cx, simulation.cy, simulation)
 
     # Applies F and G operators
-    F_operator(simulation.px.dF, simulation.px.f_upw, simulation.cx, simulation)
-    G_operator(simulation.py.dF, simulation.py.f_upw, simulation.cy, simulation)
+    F_operator(simulation)
+    G_operator(simulation)
 
     N = simulation.N
     ng = simulation.ng
@@ -54,11 +55,12 @@ def divergence(simulation):
         Qy = ne.evaluate('0.5*(Q + (Q + pydF)/(1.0-(c1y-c2y)))')
 
     # Compute the fluxes again
-    compute_fluxes(Qy, Qx, simulation.px, simulation.py, simulation.cx, simulation.cy, simulation)
+    compute_fluxes(Qy, Qx, simulation.px, simulation.py,\
+    simulation.U_pu, simulation.U_pv, simulation.cx, simulation.cy, simulation)
 
     # Applies F and G operators again
-    F_operator(simulation.px.dF, simulation.px.f_upw, simulation.cx, simulation)
-    G_operator(simulation.py.dF, simulation.py.f_upw, simulation.cy, simulation)
+    F_operator(simulation)
+    G_operator(simulation)
 
     # Compute the divergence
     pxdF = simulation.px.dF
@@ -72,32 +74,31 @@ def divergence(simulation):
 # u_edges (velocity in x direction at edges)
 # Formula 2.7 from Lin and Rood 1996
 ####################################################################################
-def F_operator(F, flux_x, cx, simulation):
+def F_operator(simulation):
     N = simulation.N
     i0 = simulation.i0
     iend = simulation.iend
 
     #F[i0:iend,:] = -(cx[i0+1:iend+1,:]*flux_x[i0+1:iend+1,:] - cx[i0:iend,:]*flux_x[i0:iend,:])
-    c1 = cx[i0+1:iend+1,:]
-    c2 = cx[i0:iend,:]
-    f1 = flux_x[i0+1:iend+1,:]
-    f2 = flux_x[i0:iend,:]
-    F[i0:iend,:] = ne.evaluate("-(c1*f1-c2*f2)")
+    f1 = simulation.px.f_upw[i0+1:iend+1,:]
+    f2 = simulation.px.f_upw[i0:iend,:]
+    simulation.px.dF[i0:iend,:] = ne.evaluate("-(f1-f2)")
+    simulation.px.dF[i0:iend,:] = simulation.px.dF[i0:iend,:]*simulation.dt/simulation.dx
+
 ####################################################################################
 # Flux operator in y direction
 # Inputs: Q (average values),
 # v_edges (velocity in y direction at edges)
 # Formula 2.8 from Lin and Rood 1996
 ####################################################################################
-def G_operator(G, flux_y, cy, simulation):
+def G_operator(simulation):
     M = simulation.M
     j0 = simulation.j0
     jend = simulation.jend
 
     #G[:,j0:jend] = -(cy[:,j0+1:jend+1]*flux_y[:,j0+1:jend+1] - cy[:,j0:jend]*flux_y[:,j0:jend])
-    c1 = cy[:,j0+1:jend+1]
-    c2 = cy[:,j0:jend]
-    g1 = flux_y[:,j0+1:jend+1]
-    g2 = flux_y[:,j0:jend]
-    G[:,j0:jend] = ne.evaluate("-(c1*g1-c2*g2)")
+    g1 = simulation.py.f_upw[:,j0+1:jend+1]
+    g2 = simulation.py.f_upw[:,j0:jend]
+    simulation.py.dF[:,j0:jend] = ne.evaluate("-(g1-g2)")
+    simulation.py.dF[:,j0:jend] = simulation.py.dF[:,j0:jend]*simulation.dt/simulation.dy
 
