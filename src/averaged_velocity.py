@@ -28,12 +28,12 @@ def time_averaged_velocity(U_pu, U_pv, t, simulation):
 
     # Compute the velocity needed for the departure point
     if simulation.vf == 1: # constant velocity
-        simulation.U_pu.u_averaged[:,:] = simulation.U_pu.u[:,:]
-        simulation.U_pv.v_averaged[:,:] = simulation.U_pv.v[:,:]
+        simulation.U_pu.u_averaged[:,:] = simulation.U_pu.u_timecenter[:,:]
+        simulation.U_pv.v_averaged[:,:] = simulation.U_pv.v_timecenter[:,:]
     elif simulation.vf >= 2:
         if simulation.dp == 1:
-            simulation.U_pu.u_averaged[:,:] = simulation.U_pu.u[:,:]
-            simulation.U_pv.v_averaged[:,:] = simulation.U_pv.v[:,:]
+            simulation.U_pu.u_averaged[:,:] = simulation.U_pu.u_timecenter[:,:]
+            simulation.U_pv.v_averaged[:,:] = simulation.U_pv.v_timecenter[:,:]
 
         elif simulation.dp == 2:
             dt = simulation.dt
@@ -43,7 +43,8 @@ def time_averaged_velocity(U_pu, U_pv, t, simulation):
             #----------------------------------------------------
             # x direction
             # Velocity data at edges used for interpolation
-            u_interp = ne.evaluate('1.5*u - 0.5*u_old', local_dict=vars(simulation.U_pu)) # extrapolation for time at n+1/2
+            #u_interp = ne.evaluate('1.5*u - 0.5*u_old', local_dict=vars(simulation.U_pu)) # extrapolation for time at n+1/2
+            u_interp = simulation.U_pu.u_timecenter[:,:]
 
             # Linear interpolation
             upos, uneg = U_pu.upos, U_pu.uneg
@@ -57,7 +58,9 @@ def time_averaged_velocity(U_pu, U_pv, t, simulation):
             #----------------------------------------------------
             # y direction
             # Velocity data at edges used for interpolation
-            v_interp = ne.evaluate('1.5*v - 0.5*v_old', local_dict=vars(simulation.U_pv)) # extrapolation for time at n+1/2
+            #v_interp = ne.evaluate('1.5*v - 0.5*v_old', local_dict=vars(simulation.U_pv)) # extrapolation for time at n+1/2
+            v_interp = simulation.U_pv.v_timecenter[:,:]
+
             # Linear interpolation
             vpos, vneg = U_pv.vpos, U_pv.vneg
             a = (dto2*simulation.U_pv.v[:,j0:jend+1])/simulation.dy

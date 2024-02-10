@@ -295,6 +295,7 @@ class velocity:
             self.v = np.zeros((N+1+ng, M+ng))
             self.u_averaged = np.zeros((N+1+ng, M+ng)) # used for departure point
             self.u_old      = np.zeros((N+1+ng, M+ng)) # used for departure point
+            self.u_timecenter = np.zeros((N+1+ng, M+ng)) # used for departure point
             self.upos = None
             self.uneg = None
         elif pos == 'pv':
@@ -302,6 +303,7 @@ class velocity:
             self.v = np.zeros((N+ng, M+1+ng))
             self.v_averaged = np.zeros((N+ng, M+1+ng)) # used for departure point
             self.v_old      = np.zeros((N+ng, M+1+ng)) # used for departure point
+            self.v_timecenter = np.zeros((N+ng, M+1+ng)) # used for departure point
             self.vpos = None
             self.vneg = None
         else:

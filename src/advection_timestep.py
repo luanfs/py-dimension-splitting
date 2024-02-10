@@ -13,7 +13,7 @@ import numexpr as ne
 def adv_timestep(t, k, simulation):
     N  = simulation.N    # Number of cells in x direction
     M  = simulation.M    # Number of cells in y direction
-
+    dt = simulation.dt
     # Ghost cells
     ngl = simulation.ngl
     ngr = simulation.ngr
@@ -24,6 +24,11 @@ def adv_timestep(t, k, simulation):
     iend = simulation.iend
     j0 = simulation.j0
     jend = simulation.jend
+
+    if simulation.vf >= 2:
+        # Velocity update
+        simulation.U_pu.u_timecenter[:,:] = u_velocity_adv_2d(simulation.Xu, simulation.Yu, t-dt*0.5, simulation)
+        simulation.U_pv.v_timecenter[:,:] = v_velocity_adv_2d(simulation.Xv, simulation.Yv, t-dt*0.5, simulation)
 
     # Compute the velocity need for the departure point (only for variable velocity)
     time_averaged_velocity(simulation.U_pu, simulation.U_pv, t, simulation)
