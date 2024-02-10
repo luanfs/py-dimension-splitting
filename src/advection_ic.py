@@ -123,7 +123,7 @@ def u_velocity_adv_2d(x, y, t, simulation):
 def v_velocity_adv_2d(x, y, t, simulation):
     pi = np.pi
     if simulation.vf == 1:
-        v = -0.2
+        v = 0.2
     elif simulation.vf == 2:
         T = 5.0
         #v = -np.sin(np.pi*y)**2*np.sin(2.0*np.pi*x)*np.cos(np.pi*t/T)
