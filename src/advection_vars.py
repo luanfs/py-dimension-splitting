@@ -62,6 +62,8 @@ def adv_vars(simulation):
     simulation.U_pv.v[:,:] = v_velocity_adv_2d(simulation.Xv, simulation.Yv, 0.0, simulation)
     simulation.U_pu.u_old[:,:] = simulation.U_pu.u[:,:]
     simulation.U_pv.v_old[:,:] = simulation.U_pv.v[:,:]
+    simulation.U_pu.u_timecenter[:,:] = simulation.U_pu.u[:,:]
+    simulation.U_pv.v_timecenter[:,:] = simulation.U_pv.v[:,:]
 
     # CFL at edges - x direction
     simulation.cx = cfl_x(simulation.U_pu.u[:,:], simulation)
