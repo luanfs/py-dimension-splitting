@@ -154,18 +154,18 @@ def ppm_reconstruction_x(Q, px, simulation):
     elif px.recon_name == 'PPM-L04':  #PPM with monotonization from Lin 04 paper
         # Formula B1 from Lin 04
         #px.dQ[i0-3:iend+3,:] = 0.25*(Q[i0-2:iend+4,:] - Q[i0-4:iend+2,:])
-        Q1 = Q[i0-2:iend+4,:]
-        Q2 = Q[i0-4:iend+2,:]
-        px.dQ[i0-3:iend+3,:] = ne.evaluate('0.25*(Q1-Q2)')
+        Q1 = Q[i0-1:iend+3,:]
+        Q2 = Q[i0-3:iend+1,:]
+        px.dQ[i0-2:iend+2,:] = ne.evaluate('0.25*(Q1-Q2)')
 
         #px.dQ_min[i0-3:iend+3,:]  = np.maximum(np.maximum(Q[i0-4:iend+2,:], Q[i0-3:iend+3,:]), Q[i0-2:iend+4,:]) - Q[i0-3:iend+3,:]
         #px.dQ_max[i0-3:iend+3,:]  = Q[i0-3:iend+3,:] - np.minimum(np.minimum(Q[i0-4:iend+2,:], Q[i0-3:iend+3,:]), Q[i0-2:iend+4,:])
-        Q_max = np.maximum(np.maximum(Q[i0-4:iend+2,:], Q[i0-3:iend+3,:]), Q[i0-2:iend+4,:])
-        Q_min = np.minimum(np.minimum(Q[i0-4:iend+2,:], Q[i0-3:iend+3,:]), Q[i0-2:iend+4,:])
-        Q0 = Q[i0-3:iend+3,:]
-        px.dQ_min[i0-3:iend+3,:]  = ne.evaluate('Q_max-Q0')
-        px.dQ_max[i0-3:iend+3,:]  = ne.evaluate('Q0-Q_min')
-        px.dQ_mono[i0-3:iend+3,:] = np.minimum(np.minimum(abs(px.dQ[i0-3:iend+3,:]),px.dQ_min[i0-3:iend+3,:]),px.dQ_max[i0-3:iend+3,:])*np.sign(px.dQ[i0-3:iend+3,:])
+        Q_max = np.maximum(np.maximum(Q[i0-3:iend+1,:], Q[i0-2:iend+2,:]), Q[i0-1:iend+3,:])
+        Q_min = np.minimum(np.minimum(Q[i0-3:iend+1,:], Q[i0-2:iend+2,:]), Q[i0-1:iend+3,:])
+        Q0 = Q[i0-2:iend+2,:]
+        px.dQ_min[i0-2:iend+2,:]  = ne.evaluate('Q_max-Q0')
+        px.dQ_max[i0-2:iend+2,:]  = ne.evaluate('Q0-Q_min')
+        px.dQ_mono[i0-2:iend+2,:] = np.minimum(np.minimum(abs(px.dQ[i0-2:iend+2,:]),px.dQ_min[i0-2:iend+2,:]),px.dQ_max[i0-2:iend+2,:])*np.sign(px.dQ[i0-2:iend+2,:])
 
         # Formula B2 from Lin 04
         #px.Q_edges[i0-1:iend+2,:] = 0.5*(Q[i0-1:iend+2,:] + Q[i0-2:iend+1,:]) - (px.dQ_mono[i0-1:iend+2,:] - px.dQ_mono[i0-2:iend+1,:])/3.0
@@ -337,19 +337,16 @@ def ppm_reconstruction_y(Q, py, simulation):
 
     elif py.recon_name == 'PPM-L04':  #PPM with monotonization from Lin 04 paper
         # Formula B1 from Lin 04
-        #py.dQ[:,j0-3:jend+3] = 0.25*(Q[:,j0-2:jend+4] - Q[:,j0-4:jend+2])
-        Q1 = Q[:,j0-2:jend+4]
-        Q2 = Q[:,j0-4:jend+2]
-        py.dQ[:,j0-3:jend+3] = ne.evaluate("0.25*(Q1-Q2)")
+        Q1 = Q[:,j0-1:jend+3]
+        Q2 = Q[:,j0-3:jend+1]
+        py.dQ[:,j0-2:jend+2] = ne.evaluate("0.25*(Q1-Q2)")
 
-        #py.dQ_min[:,j0-3:jend+3]  = np.maximum(np.maximum(Q[:,j0-4:jend+2], Q[:,j0-3:jend+3]), Q[:,j0-2:jend+4]) - Q[:,j0-3:jend+3]
-        #py.dQ_max[:,j0-3:jend+3]  = Q[:,j0-3:jend+3] - np.minimum(np.minimum(Q[:,j0-4:jend+2], Q[:,j0-3:jend+3]), Q[:,j0-2:jend+4])
-        Q_max = np.maximum(np.maximum(Q[:,j0-4:jend+2], Q[:,j0-3:jend+3]), Q[:,j0-2:jend+4])
-        Q_min = np.minimum(np.minimum(Q[:,j0-4:jend+2], Q[:,j0-3:jend+3]), Q[:,j0-2:jend+4])
-        Q0 = Q[:,j0-3:jend+3]
-        py.dQ_min[:,j0-3:jend+3]  = ne.evaluate('Q_max-Q0')
-        py.dQ_max[:,j0-3:jend+3]  = ne.evaluate('Q0-Q_min')
-        py.dQ_mono[:,j0-3:jend+3] = np.minimum(np.minimum(abs(py.dQ[:,j0-3:jend+3]), py.dQ_min[:,j0-3:jend+3]), py.dQ_max[:,j0-3:jend+3]) * np.sign(py.dQ[:,j0-3:jend+3])
+        Q_max = np.maximum(np.maximum(Q[:,j0-3:jend+1], Q[:,j0-2:jend+2]), Q[:,j0-1:jend+3])
+        Q_min = np.minimum(np.minimum(Q[:,j0-3:jend+1], Q[:,j0-2:jend+2]), Q[:,j0-1:jend+3])
+        Q0 = Q[:,j0-2:jend+2]
+        py.dQ_min[:,j0-2:jend+2]  = ne.evaluate('Q_max-Q0')
+        py.dQ_max[:,j0-2:jend+2]  = ne.evaluate('Q0-Q_min')
+        py.dQ_mono[:,j0-2:jend+2] = np.minimum(np.minimum(abs(py.dQ[:,j0-2:jend+2]), py.dQ_min[:,j0-2:jend+2]), py.dQ_max[:,j0-2:jend+2]) * np.sign(py.dQ[:,j0-2:jend+2])
 
         # Formula B2 from Lin 04
         #py.Q_edges[:,j0-1:jend+2] = 0.5*(Q[:,j0-1:jend+2] + Q[:,j0-2:jend+1]) - (py.dQ_mono[:,j0-1:jend+2] - py.dQ_mono[:,j0-2:jend+1])/3.0
